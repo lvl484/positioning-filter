@@ -1,0 +1,323 @@
+openapi: 3.0.0
+info:
+  description: >-
+    A simple HTTP service that exposes APIs to push GPS data, manage
+    notification and filtering rules and user configurations from a set of other
+    services.
+  version: "1.0.0-oas3"
+  title: Filtering service API
+tags:
+  - name: filter
+    description: Filtering service interactions API
+paths:
+  /users/{user_id}/filters:
+    post:
+      tags:
+        - filter
+      summary: Creates a new filtering configuration item.
+      description: >-
+        This endpoint takes body, decodes it to a filter object, authenticate
+        user, and pushes a new configuration item to a filtering service
+        associated to the user pushed the request.
+      operationId: createFilter
+      parameters:
+        - name: user_id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Filter'
+      responses:
+        '201':
+          description: 'Config entry is created, responds with item that is created.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterWithId'
+        '400':
+          description: >-
+            Invalid request body/headers/etc. format. Responds with description
+            of what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: >-
+            Failed to validate user credentials. Wrond credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            Some failure during request handling. Responds with description of
+            what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - filter
+      summary: Returns a list of filtering configurations.
+      description: >-
+        This endpoint authenticates user, and returns a list of filtering
+        configurations associated to the user performed the request.
+      operationId: getAllFilters
+      parameters:
+        - name: user_id
+          required: true
+          in: path
+          schema:
+            type: string
+        - in: query
+          name: offset
+          description: >-
+            The number of items to skip before starting to collect the result
+            set.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The number of items to return.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of filter configuration items is successfully read.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Filter'
+        '400':
+          description: >-
+            Invalid request body/headers/etc. format. Responds with description
+            of what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: >-
+            Failed to validate user credentials. Wrond credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            Some failure during request handling. Responds with description of
+            what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/users/{user_id}/filters/{id}':
+    get:
+      tags:
+        - filter
+      summary: Returns a filtering configuration item.
+      description: >-
+        This endpoint authenticates user, and returns a filtering configuration
+        item associated with the id provided in path.
+      operationId: getFilter
+      parameters:
+        - name: user_id
+          required: true
+          in: path
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          description: Identifier of filter.
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Respoonds with a filtering configuration object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterWithId'
+        '400':
+          description: >-
+            Invalid request body/headers/etc. format. Responds with description
+            of what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: >-
+            Failed to validate user credentials. Wrond credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            Some failure during request handling. Responds with description of
+            what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - filter
+      summary: Updates a filtering configuration item.
+      description: >-
+        This endpoint takes body, decodes it to a filter object, authenticate
+        user, and pushes updated configuration item to a filtering service
+        associated to the user pushed the request and id of the item provided in
+        path.
+      operationId: updateFilter
+      parameters:
+        - name: user_id
+          required: true
+          in: path
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          description: Identifier of filter.
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Filter'
+      responses:
+        '200':
+          description: 'Config entry is updated, responds with a new state of object.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterWithId'
+        '400':
+          description: >-
+            Invalid request body/headers/etc. format. Responds with description
+            of what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: >-
+            Failed to validate user credentials. Wrond credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No object found with associated id
+        '500':
+          description: >-
+            Some failure during request handling. Responds with description of
+            what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - filter
+      summary: Deletes a filtering configuration item.
+      description: >-
+        This endpoint authenticate user, and deletes a configuration item from
+        filtering service associated to the user and item id pushed in the
+        request.
+      operationId: deleteFilter
+      parameters:
+        - name: user_id
+          required: true
+          in: path
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          description: Identifier of filter.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Succesfully deleted.
+        '400':
+          description: >-
+            Invalid request body/headers/etc. format. Responds with description
+            of what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: >-
+            Failed to validate user credentials. Wrond credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No object found with associated id
+        '500':
+          description: >-
+            Some failure during request handling. Responds with description of
+            what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+servers:
+  - url: 'http://localhost:8080/v1'
+components:
+  requestBodies:
+    Filter:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Filter'
+      description: Filter JSON model
+  schemas:
+    Filter:
+      type: object
+      properties:
+        type:
+          type: string
+        configuration:
+          type: object
+        operation:
+          type: string
+    FilterWithId:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        value:
+          type: string
+        operation:
+          type: string
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
