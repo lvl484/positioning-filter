@@ -1,3 +1,3 @@
-//handlers contains custom handlers - CRUD through filter.
+//handlers contains custom handlers to realise CRUD (through filter)
 
 package web
