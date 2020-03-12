@@ -1,3 +1,3 @@
-module github.com/lvl484/positioning-filter/positioning-filter/build
+module 'github.com/lvl484/positioning-filter'
 
 go 1.13
