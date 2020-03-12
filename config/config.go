@@ -1,2 +1,2 @@
-//config contains application configuration
+// Package config contains application configuration.
 package config

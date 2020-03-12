@@ -1,3 +1,2 @@
-//type of filter model, detects the position inside of rectangular area
-
+// Package filter provides filter model.
 package filter

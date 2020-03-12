@@ -1,3 +1,2 @@
-//type of filter model, detects if the position is inside of round area
-
+// Package filter provides filter model.
 package filter
