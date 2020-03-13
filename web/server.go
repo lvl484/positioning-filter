@@ -1,4 +1,3 @@
-// Package web provides managing HTTP protocols.
-// Configurate endpoints to interact with other tools of the project.
-// Realise CRUD threw filters.
+// Package web provides managing HTTP protocol.
+// Implement CRUD operations for filters over HTTP API.
 package web
