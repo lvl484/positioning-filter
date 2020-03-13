@@ -14,4 +14,4 @@ MIGRATIONS_PATH -path to folder with .sql migrations files
 
 docker-compose up -d   runs docker container with postgreSQL database  
 
-sudo docker run -v "$MIGRATIONS_PATH:/migrations"  --network host migrate/migrate -path=/migrations/ -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:7557/postgres?sslmode=disable" up
+sudo docker run -v "$MIGRATIONS_PATH:/migrations"  --network host migrate/migrate -path=/migrations/ -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$DB_POST/$POSTGRES_DB?sslmode=disable" up
