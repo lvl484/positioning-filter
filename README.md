@@ -13,7 +13,6 @@ This service is intended to match positioning messages to a set of filtering rul
         timestamp    // time when position collected
         arrival      // time when position accepted by system
     }
-
 ```
 
 Position messages will be read from a kafka topic named 'positions'. Each position message will come through a set of filters that are related to the user that generated the message. If position is inside the area of the filter it will be forwarded to another kafka topic called 'matched-positions', then notification service will consume them from the topic and push notification by destination.
@@ -52,19 +51,20 @@ Filter type can be rectangular or round(in future maybe shaped)
     }
 ```  
 
-## MIGRATIONS
+## Start all services  
 
-Migrate with using golang/migrate default table/rules for user
-In table must be created default user with name 'pf_user' without any rules with own password
+You must create .env file with following variables in the root of project  
 
-### environment variables
+### Environment variables  
 
-DBPORT -host port for database  
 POSTGRES_USER -default owner for database  
 POSTGRES_PASSWORD -password for owner  
 POSTGRES_DB -default database name (db postgres will be also created)  
-MIGRATIONS_PATH -path to folder with .sql migrations files  
+PF_USER -default user for accesing database from api  
+PF_PASSWORD -password for user
 
-### commands
+### Commands  
 
-docker run -v "$MIGRATIONS_PATH:/migrations"  --network host migrate/migrate -path=/migrations/ -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$DB_POST/$POSTGRES_DB?sslmode=disable" up
+```bash
+docker-compose up --build -d  
+```
