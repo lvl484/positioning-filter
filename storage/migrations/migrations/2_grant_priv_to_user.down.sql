@@ -1,0 +1,1 @@
+REVOKE SELECT, INSERT, UPDATE, DELETE ON filters FROM pf_user;
