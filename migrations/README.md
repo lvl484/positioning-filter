@@ -1,7 +1,7 @@
 # MIGRATIONS
 
 Migrate with using golang/migrate default table/rules for user
-In table must be created default user with name 'fuser' without any ruls with own password
+In table must be created default user with name 'fuser' without any rules with own password
 
 ## environment variables
 
@@ -13,4 +13,4 @@ MIGRATIONS_PATH -path to folder with .sql migrations files
 
 ## commands
 
-sudo docker run -v "$MIGRATIONS_PATH:/migrations"  --network host migrate/migrate -path=/migrations/ -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$DB_POST/$POSTGRES_DB?sslmode=disable" up
+docker run -v "$MIGRATIONS_PATH:/migrations"  --network host migrate/migrate -path=/migrations/ -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$DB_POST/$POSTGRES_DB?sslmode=disable" up
