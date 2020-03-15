@@ -18,8 +18,8 @@ COPY web             web
 #COPY go.*            ./
 
 WORKDIR /opt/resource/cmd/
-RUN go build -o /opt/services/example-app .
+RUN go build -o /opt/services/positioning-filter .
 
 FROM alpine:3.7
-COPY --from=builder /opt/services/example-app /opt/services/example-app
-CMD /opt/services/example-app
+COPY --from=builder /opt/services/positioning-filter /opt/services/positioning-filter
+CMD /opt/services/positioning-filter
