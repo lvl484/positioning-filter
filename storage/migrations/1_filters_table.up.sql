@@ -4,4 +4,4 @@ CREATE TABLE IF NOT EXISTS filters (
     configuration JSON NOT NULL,
     reversed BOOL NOT NULL,
     user_id VARCHAR(20) NOT NULL
-)
+);
