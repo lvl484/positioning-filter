@@ -15,7 +15,6 @@ COPY filter          filter
 COPY matcher         matcher
 COPY storage         storage
 COPY web             web
-#COPY go.*            ./
 
 WORKDIR /opt/resource/cmd/
 RUN go build -o /opt/services/positioning-filter .
