@@ -55,7 +55,7 @@ Filter type can be rectangular or round(in future maybe shaped)
 ## MIGRATIONS
 
 Migrate with using golang/migrate default table/rules for user
-In table must be created default user with name 'fuser' without any rules with own password
+In table must be created default user with name 'pf_user' without any rules with own password
 
 ### environment variables
 
