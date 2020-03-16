@@ -22,7 +22,7 @@ func GracefulShutdown(server *http.Server) {
 	signal.Notify(done, signals...)
 
 	<-done
-	log.Print("Service stopped")
+	log.Print("Service stopped") //тест на сигнал
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 
@@ -32,7 +32,7 @@ func GracefulShutdown(server *http.Server) {
 	}()
 
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Service shutdown failed:%+v", err)
+		log.Fatalf("Service shutdown failed:%+v", err) //тест
 	}
 
 	log.Print("Service exited properly")
