@@ -4,26 +4,15 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
 
-var (
-	signals = []os.Signal{syscall.SIGINT, syscall.SIGTERM}
-	timeout = 10 * time.Second
-)
-
 //GracefulShutdown implements releasing all resouces it got from system, finish all request handling and return responses when service stopping.
-func GracefulShutdown(server *http.Server) {
+func GracefulShutdown(server *http.Server, done chan<- bool) {
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, signals...)
-
-	<-done
 	log.Print("Service stopped") //тест на сигнал
 
+	timeout := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 
 	defer func() {
