@@ -4,19 +4,12 @@ package config
 import (
 	"strings"
 
+	"github.com/lvl484/positioning-filter/storage"
 	"github.com/spf13/viper"
 )
 
-type PostgresConfig struct {
-	Host string
-	Port string
-	User string
-	Pass string
-	DB   string
-}
-
 // NewPostgresConfig returns pointer to PointerConfig with data read from viper.config.json
-func NewPostgresConfig(configName, configPath string) (*PostgresConfig, error) {
+func NewPostgresConfig(configName, configPath string) (*storage.DBConfig, error) {
 	v := viper.New()
 	v.AddConfigPath(configPath)
 	v.SetConfigName(configName)
@@ -26,7 +19,7 @@ func NewPostgresConfig(configName, configPath string) (*PostgresConfig, error) {
 		return nil, err
 	}
 
-	return &PostgresConfig{
+	return &storage.DBConfig{
 		Host: v.GetString("postgres.HOST"),
 		Port: v.GetString("postgres.PORT"),
 		User: v.GetString("postgres.USER"),

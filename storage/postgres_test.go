@@ -1,20 +1,34 @@
 package storage
 
 import (
+	"log"
+	"strings"
 	"testing"
 
 	_ "github.com/lib/pq"
-
-	"github.com/lvl484/positioning-filter/config"
+	"github.com/spf13/viper"
 )
 
 func Test_Connect(t *testing.T) {
-	conf, err := config.NewPostgresConfig()
-	if err != nil {
+	v := viper.New()
+	v.AddConfigPath("../config/")
+	v.SetConfigName("viper.config")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	if err := v.ReadInConfig(); err != nil {
 		t.Error(err)
 	}
 
-	incorrectConf := &config.PostgresConfig{
+	conf := &DBConfig{
+		Host: v.GetString("postgres.HOST"),
+		Port: v.GetString("postgres.PORT"),
+		User: v.GetString("postgres.USER"),
+		Pass: v.GetString("postgres.PASS"),
+		DB:   v.GetString("postgres.DB"),
+	}
+	log.Println(conf)
+
+	incorrectConf := &DBConfig{
 		Host: "localhouston",
 		Port: "we",
 		User: "have",
@@ -24,7 +38,7 @@ func Test_Connect(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		config  *config.PostgresConfig
+		config  *DBConfig
 		wantErr bool
 	}{
 		{
