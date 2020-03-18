@@ -14,5 +14,8 @@
 # Environment file
 .env
 
+# Configs
+*.config.json
+
 # Directory for postgres data
 postgresData/
