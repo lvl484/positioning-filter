@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	configPath = "./"
-	configName = "viper.config"
-)
-
 type PostgresConfig struct {
 	Host string
 	Port string
