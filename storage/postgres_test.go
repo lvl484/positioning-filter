@@ -11,12 +11,11 @@ import (
 
 const (
 	configPath = "../config/"
-	configName = "postgres.config"
+	configName = "viper.config"
 )
 
 func TestConnect(t *testing.T) {
 	v := viper.New()
-	v.AutomaticEnv()
 	v.AddConfigPath(configPath)
 	v.SetConfigName(configName)
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
