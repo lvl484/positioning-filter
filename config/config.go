@@ -21,7 +21,7 @@ type PostgresConfig struct {
 }
 
 // NewPostgresConfig returns pointer to PointerConfig with data read from viper.config.json
-func NewPostgresConfig() (*PostgresConfig, error) {
+func NewPostgresConfig(configName, configPath string) (*PostgresConfig, error) {
 	v := viper.New()
 	v.AddConfigPath(configPath)
 	v.SetConfigName(configName)
