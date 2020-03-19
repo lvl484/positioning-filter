@@ -9,7 +9,7 @@ import (
 )
 
 // NewPostgresConfig returns pointer to PointerConfig with data read from viper.config.json
-func NewPostgresConfig(configName, configPath string) (*storage.DBConfig, error) {
+func NewDBConfig(configName, configPath string) (*storage.DBConfig, error) {
 	v := viper.New()
 	v.AddConfigPath(configPath)
 	v.SetConfigName(configName)

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestNewPostgresConfig(t *testing.T) {
+func TestNewDBConfig(t *testing.T) {
 	type args struct {
 		configName string
 		configPath string
@@ -29,7 +29,7 @@ func TestNewPostgresConfig(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewPostgresConfig(tt.args.configName, tt.args.configPath)
+			_, err := NewDBConfig(tt.args.configName, tt.args.configPath)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewPostgresConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
