@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"log"
 	"strings"
 	"testing"
 
@@ -34,7 +33,6 @@ func TestConnect(t *testing.T) {
 		Pass: v.GetString(postgresPass),
 		DB:   v.GetString(postgresDB),
 	}
-	log.Println(conf)
 
 	incorrectConf := &DBConfig{
 		Host: "localhouston",
