@@ -24,12 +24,13 @@ func GracefulShutdown(sigs <-chan os.Signal, done chan<- bool) error {
 
 	defer func() {
 		// Handle extra services here (like closing database, etc.)
+
+		if err := srv.Shutdown(ctx); err != nil {
+			log.Fatalf("Server shutdown failed:%+v", err)
+		}
+
 		cancel()
 	}()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server shutdown failed:%+v", err)
-	}
 
 	done <- true
 
