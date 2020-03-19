@@ -9,6 +9,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	postgresHost = "postgres.HOST"
+	postgresPort = "postgres.PORT"
+	postgresUser = "postgres.USER"
+	postgresPass = "postgres.PASS"
+	postgresDB   = "postgres.DB"
+)
+
 func TestConnect(t *testing.T) {
 	v := viper.New()
 	v.AddConfigPath("../config/")
@@ -20,11 +28,11 @@ func TestConnect(t *testing.T) {
 	}
 
 	conf := &DBConfig{
-		Host: v.GetString("postgres.HOST"),
-		Port: v.GetString("postgres.PORT"),
-		User: v.GetString("postgres.USER"),
-		Pass: v.GetString("postgres.PASS"),
-		DB:   v.GetString("postgres.DB"),
+		Host: v.GetString(postgresHost),
+		Port: v.GetString(postgresPort),
+		User: v.GetString(postgresUser),
+		Pass: v.GetString(postgresPass),
+		DB:   v.GetString(postgresDB),
 	}
 	log.Println(conf)
 
