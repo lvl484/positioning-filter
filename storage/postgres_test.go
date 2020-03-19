@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Test_Connect(t *testing.T) {
+func TestConnect(t *testing.T) {
 	v := viper.New()
 	v.AddConfigPath("../config/")
 	v.SetConfigName("viper.config")
