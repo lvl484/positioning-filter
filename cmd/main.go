@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -18,11 +17,10 @@ func main() {
 	go func() {
 		err := GracefulShutdown(sigs, done)
 		if err != nil {
-			log.Fatalf("Server graceful shutdown failed: %v", err)
+			log.Fatalf("Service graceful shutdown failed: %v", err)
 		}
 	}()
 
 	<-done
-	fmt.Println("exiting")
-
+	log.Println("Service successful shutdown")
 }

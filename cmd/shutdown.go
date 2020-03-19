@@ -28,7 +28,7 @@ func GracefulShutdown(sigs <-chan os.Signal, done chan<- bool) error {
 	}()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Service shutdown failed:%+v", err)
+		log.Fatalf("Server shutdown failed:%+v", err)
 	}
 
 	done <- true

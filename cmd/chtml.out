@@ -1,0 +1,10 @@
+mode: set
+github.com/lvl484/positioning-filter/cmd/main.go:10.13,17.12 4 0
+github.com/lvl484/positioning-filter/cmd/main.go:24.2,25.44 2 0
+github.com/lvl484/positioning-filter/cmd/main.go:17.12,19.17 2 0
+github.com/lvl484/positioning-filter/cmd/main.go:19.17,21.4 1 0
+github.com/lvl484/positioning-filter/cmd/shutdown.go:13.70,25.15 6 1
+github.com/lvl484/positioning-filter/cmd/shutdown.go:30.2,30.42 1 1
+github.com/lvl484/positioning-filter/cmd/shutdown.go:34.2,36.12 2 1
+github.com/lvl484/positioning-filter/cmd/shutdown.go:25.15,28.3 1 1
+github.com/lvl484/positioning-filter/cmd/shutdown.go:30.42,32.3 1 0
