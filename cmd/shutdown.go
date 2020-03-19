@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -9,16 +10,20 @@ import (
 )
 
 //GracefulShutdown implements releasing all resouces it got from system, finish all request handling and return responses when service stopping.
-func GracefulShutdown(done <-chan os.Signal, srv *http.Server) {
-
-	<-done
-	log.Print("Service stopped")
+func GracefulShutdown(sigs <-chan os.Signal, done chan<- bool) error {
+	sig := <-sigs
+	fmt.Println("Recieved", sig, "signal")
 
 	timeout := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 
+	//Replace srv value with your server
+	srv := &http.Server{
+		Addr: ":8080",
+	}
+
 	defer func() {
-		// handle extra services here (like closing database, etc.)
+		// Handle extra services here (like closing database, etc.)
 		cancel()
 	}()
 
@@ -26,5 +31,7 @@ func GracefulShutdown(done <-chan os.Signal, srv *http.Server) {
 		log.Fatalf("Service shutdown failed:%+v", err)
 	}
 
-	log.Print("Service exited properly")
+	done <- true
+
+	return nil
 }
