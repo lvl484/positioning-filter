@@ -2,10 +2,16 @@
 package config
 
 import (
+	"reflect"
 	"testing"
+
+	"github.com/lvl484/positioning-filter/consul"
+	"github.com/lvl484/positioning-filter/logger"
+	"github.com/lvl484/positioning-filter/storage"
+	"github.com/spf13/viper"
 )
 
-func TestNewDBConfig(t *testing.T) {
+func TestNewViperCfg(t *testing.T) {
 	type args struct {
 		configName string
 		configPath string
@@ -29,10 +35,126 @@ func TestNewDBConfig(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewDBConfig(tt.args.configName, tt.args.configPath)
+			_, err := NewViperCfg(tt.args.configName, tt.args.configPath)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewPostgresConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			}
+		})
+	}
+}
+
+func TestViperCfgNewConsulConfig(t *testing.T) {
+	v, err := NewViperCfg("testConfigForViper", "../testData/")
+	if err != nil {
+		t.Errorf("Cant start test, err: %v", err)
+	}
+
+	type fields struct {
+		v *viper.Viper
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   *consul.Config
+	}{
+		{
+			name:   "test",
+			fields: fields{v: v.v},
+			want: &consul.Config{
+				Address:            "HOST2",
+				ServicePort:        111,
+				ServiceName:        "NAME2",
+				ServiceHealthCheck: "HEALTH2",
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			vcfg := &ViperCfg{
+				v: tt.fields.v,
+			}
+			if got := vcfg.NewConsulConfig(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ViperCfg.NewConsulConfig() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestViperCfgNewDBConfig(t *testing.T) {
+	v, err := NewViperCfg("testConfigForViper", "../testData/")
+	if err != nil {
+		t.Errorf("Cant start test, err: %v", err)
+	}
+
+	type fields struct {
+		v *viper.Viper
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   *storage.DBConfig
+	}{
+		{
+			name:   "test",
+			fields: fields{v: v.v},
+			want: &storage.DBConfig{
+				Host: "HOST1",
+				Port: "PORT1",
+				User: "USER1",
+				Pass: "PASSWORD1",
+				DB:   "DB1",
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			vcfg := &ViperCfg{
+				v: tt.fields.v,
+			}
+			if got := vcfg.NewDBConfig(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ViperCfg.NewConsulConfig() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestViperCfgNewLoggerConfig(t *testing.T) {
+	v, err := NewViperCfg("testConfigForViper", "../testData/")
+	if err != nil {
+		t.Errorf("Cant start test, err: %v", err)
+	}
+
+	type fields struct {
+		v *viper.Viper
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   *logger.Config
+	}{
+		{
+			name:   "test",
+			fields: fields{v: v.v},
+			want: &logger.Config{
+				Host: "HOST3",
+				Port: "PORT3",
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			vcfg := &ViperCfg{
+				v: tt.fields.v,
+			}
+			if got := vcfg.NewLoggerConfig(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ViperCfg.NewLoggerConfig() = %v, want %v", got, tt.want)
 			}
 		})
 	}

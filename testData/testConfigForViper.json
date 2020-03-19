@@ -1,0 +1,19 @@
+{
+    "postgres" : {
+        "Host": "HOST1",
+        "Port": "PORT1",
+        "DB": "DB1",
+        "User": "USER1",
+        "Pass": "PASSWORD1"
+    },
+    "consul": {
+        "Addr": "HOST2",
+        "ServicePort": 111,
+        "ServiceName": "NAME2",
+        "ServiceHealthCheck": "HEALTH2"
+    },
+    "logger": {
+        "Host": "HOST3",
+        "Port": "PORT3"
+    }
+}
