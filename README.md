@@ -13,7 +13,6 @@ This service is intended to match positioning messages to a set of filtering rul
         timestamp    // time when position collected
         arrival      // time when position accepted by system
     }
-
 ```
 
 Position messages will be read from a kafka topic named 'positions'. Each position message will come through a set of filters that are related to the user that generated the message. If position is inside the area of the filter it will be forwarded to another kafka topic called 'matched-positions', then notification service will consume them from the topic and push notification by destination.
@@ -50,4 +49,22 @@ Filter type can be rectangular or round(in future maybe shaped)
     RectangularFilter {
         point top left, point bottom right {latitude, longitude}   // A couple of points on a map that describes margin of rectangle area.
     }
+```  
+
+## Start all services  
+
+You must create .env file with following variables in the root of project  
+
+### Environment variables  
+
+POSTGRES_USER -default owner for database  
+POSTGRES_PASSWORD -password for owner  
+POSTGRES_DB -default database name (db postgres will be also created)  
+PF_USER -default user for accesing database from api  
+PF_PASSWORD -password for user
+
+### Commands  
+
+```bash
+docker-compose up --build -d  
 ```

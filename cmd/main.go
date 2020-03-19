@@ -5,15 +5,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 func main() {
-
-	for {
-		log.Println(" [INFO] App is running.")
-		time.Sleep(5 * time.Second)
-	}
 
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool, 1)
@@ -29,4 +23,5 @@ func main() {
 
 	<-done
 	log.Println("Service successful shutdown")
+
 }

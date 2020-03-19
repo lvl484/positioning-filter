@@ -1,0 +1,48 @@
+{
+    "services": [
+        {
+        "name": "kafka",
+        "tags": ["kafka"],
+        "port": 9092,
+        "checks": [
+            {
+                "name": "kafka-tcp-check",
+                "tcp": "kafka:9092",
+                "interval": "30s",
+                "timeout": "5s"
+              }]
+        },{
+        "name": "zookeeper",
+        "tags": ["kafka", "zookeeper"],
+        "port": 2181,
+        "checks": [
+            {
+                "name": "zookeeper-check",
+                "tcp": "zookeeper:2181",
+                "interval": "30s",
+                "timeout": "5s"
+            }]
+        },{
+        "name": "graylog",
+        "tags": ["graylog"],
+        "port": 9000,
+        "checks": [
+            {
+                "name": "graylog-check-1",
+                "tcp": "graylog:9000",
+                "interval": "30s",
+                "timeout": "5s"
+            }]
+        },{
+        "name": "postgres",
+        "tags": ["postgres"],
+        "port": 5432,
+        "checks": [
+            {
+                "name": "postgres-check-1",
+                "tcp": "postgres:5432",
+                "interval": "30s",
+                "timeout": "5s"
+            }]
+        }]
+    }
