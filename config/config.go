@@ -16,7 +16,7 @@ const (
 	postgresDB   = "postgres.DB"
 )
 
-// NewPostgresConfig returns pointer to PointerConfig with data read from viper.config.json
+// NewDBConfig returns pointer to storage.DBConfig with data read from viper.config.json
 func NewDBConfig(configName, configPath string) (*storage.DBConfig, error) {
 	v := viper.New()
 	v.AddConfigPath(configPath)
