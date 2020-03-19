@@ -8,6 +8,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	postgresHost = "postgres.HOST"
+	postgresPort = "postgres.PORT"
+	postgresUser = "postgres.USER"
+	postgresPass = "postgres.PASS"
+	postgresDB   = "postgres.DB"
+)
+
 // NewPostgresConfig returns pointer to PointerConfig with data read from viper.config.json
 func NewDBConfig(configName, configPath string) (*storage.DBConfig, error) {
 	v := viper.New()
@@ -20,10 +28,10 @@ func NewDBConfig(configName, configPath string) (*storage.DBConfig, error) {
 	}
 
 	return &storage.DBConfig{
-		Host: v.GetString("postgres.HOST"),
-		Port: v.GetString("postgres.PORT"),
-		User: v.GetString("postgres.USER"),
-		Pass: v.GetString("postgres.PASS"),
-		DB:   v.GetString("postgres.DB"),
+		Host: v.GetString(postgresHost),
+		Port: v.GetString(postgresPort),
+		User: v.GetString(postgresUser),
+		Pass: v.GetString(postgresPass),
+		DB:   v.GetString(postgresDB),
 	}, nil
 }
