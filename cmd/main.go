@@ -22,13 +22,13 @@ func main() {
 
 	consulConfig := viper.NewConsulConfig()
 	agentConfig := consulConfig.AgentConfig()
-	clientConfig, err := consulConfig.NewClient()
+	consulClient, err := consulConfig.NewClient()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = consulConfig.ServiceRegister(clientConfig, agentConfig); err != nil {
+	if err = consulConfig.ServiceRegister(consulClient, agentConfig); err != nil {
 		log.Fatal(err)
 	}
 
