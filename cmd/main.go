@@ -21,7 +21,6 @@ func main() {
 
 	// CONSUL ------------------------
 	consulCfg := viper.NewConsulConfig()
-	log.Println(consulCfg)
 	agentCfg := consulCfg.AgentConfig()
 	clientCfg, err := consulCfg.NewClient()
 
