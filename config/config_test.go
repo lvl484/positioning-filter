@@ -63,10 +63,10 @@ func TestConfigNewConsulConfig(t *testing.T) {
 			name:   "test",
 			fields: fields{v: v.v},
 			want: &consul.Config{
-				Address:            "HOST2",
-				ServicePort:        111,
-				ServiceName:        "NAME2",
-				ServiceHealthCheck: "HEALTH2",
+				Address:                "HOST2",
+				ServicePort:            111,
+				ServiceName:            "NAME2",
+				ServiceHealthCheckPath: "HEALTH2",
 			},
 		},
 	}

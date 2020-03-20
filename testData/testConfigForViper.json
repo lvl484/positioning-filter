@@ -10,7 +10,7 @@
         "Addr": "HOST2",
         "ServicePort": 111,
         "ServiceName": "NAME2",
-        "ServiceHealthCheck": "HEALTH2"
+        "ServiceHealthCheckPath": "HEALTH2"
     },
     "logger": {
         "Host": "HOST3",

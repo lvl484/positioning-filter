@@ -21,10 +21,10 @@ const (
 	loggerHost = "logger.Host"
 	loggerPort = "logger.Port"
 
-	consulAddr               = "consul.Addr"
-	consulServiceName        = "consul.ServiceName"
-	consulServicePort        = "consul.ServicePort"
-	consulServiceHealthCheck = "consul.ServiceHealthCheck"
+	consulAddr                   = "consul.Addr"
+	consulServiceName            = "consul.ServiceName"
+	consulServicePort            = "consul.ServicePort"
+	consulServiceHealthCheckPath = "consul.ServiceHealthCheckPath"
 )
 
 type Config struct {
@@ -66,9 +66,9 @@ func (vcfg *Config) NewLoggerConfig() *logger.Config {
 // NewConsulConfig returns pointer to consul.Config with data read from viper.config.json
 func (vcfg *Config) NewConsulConfig() *consul.Config {
 	return &consul.Config{
-		Address:            vcfg.v.GetString(consulAddr),
-		ServiceName:        vcfg.v.GetString(consulServiceName),
-		ServicePort:        vcfg.v.GetInt(consulServicePort),
-		ServiceHealthCheck: vcfg.v.GetString(consulServiceHealthCheck),
+		Address:                vcfg.v.GetString(consulAddr),
+		ServiceName:            vcfg.v.GetString(consulServiceName),
+		ServicePort:            vcfg.v.GetInt(consulServicePort),
+		ServiceHealthCheckPath: vcfg.v.GetString(consulServiceHealthCheckPath),
 	}
 }
