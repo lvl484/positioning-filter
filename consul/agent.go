@@ -15,6 +15,7 @@ const (
 // AgentConfig returns new consul agent config
 func (c *Config) AgentConfig() *consulApi.AgentServiceRegistration {
 	return &consulApi.AgentServiceRegistration{
+		ID:   c.ServiceName,
 		Name: c.ServiceName,
 		Check: &consulApi.AgentServiceCheck{
 			HTTP:     fmt.Sprintf("http://%s:%d%s", c.ServiceName, c.ServicePort, c.ServiceHealthCheckPath),
