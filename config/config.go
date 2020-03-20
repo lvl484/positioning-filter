@@ -27,11 +27,11 @@ const (
 	consulServiceHealthCheck = "consul.ServiceHealthCheck"
 )
 
-type ViperCfg struct {
+type Config struct {
 	v *viper.Viper
 }
 
-func NewViperCfg(configName, configPath string) (*ViperCfg, error) {
+func NewConfig(configName, configPath string) (*Config, error) {
 	v := viper.New()
 	v.AddConfigPath(configPath)
 	v.SetConfigName(configName)
@@ -41,11 +41,11 @@ func NewViperCfg(configName, configPath string) (*ViperCfg, error) {
 		return nil, err
 	}
 
-	return &ViperCfg{v: v}, nil
+	return &Config{v: v}, nil
 }
 
 // NewDBConfig returns pointer to storage.DBConfig with data read from viper.config.json
-func (vcfg *ViperCfg) NewDBConfig() *storage.DBConfig {
+func (vcfg *Config) NewDBConfig() *storage.DBConfig {
 	return &storage.DBConfig{
 		Host: vcfg.v.GetString(postgresHost),
 		Port: vcfg.v.GetString(postgresPort),
@@ -56,7 +56,7 @@ func (vcfg *ViperCfg) NewDBConfig() *storage.DBConfig {
 }
 
 // NewLoggerConfig returns pointer to logger.Config with data read from viper.config.json
-func (vcfg *ViperCfg) NewLoggerConfig() *logger.Config {
+func (vcfg *Config) NewLoggerConfig() *logger.Config {
 	return &logger.Config{
 		Host: vcfg.v.GetString(loggerHost),
 		Port: vcfg.v.GetString(loggerPort),
@@ -64,7 +64,7 @@ func (vcfg *ViperCfg) NewLoggerConfig() *logger.Config {
 }
 
 // NewConsulConfig returns pointer to consul.Config with data read from viper.config.json
-func (vcfg *ViperCfg) NewConsulConfig() *consul.Config {
+func (vcfg *Config) NewConsulConfig() *consul.Config {
 	return &consul.Config{
 		Address:            vcfg.v.GetString(consulAddr),
 		ServiceName:        vcfg.v.GetString(consulServiceName),

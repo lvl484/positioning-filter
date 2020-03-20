@@ -14,7 +14,7 @@ const (
 )
 
 func main() {
-	viper, err := config.NewViperCfg(configName, configPath)
+	viper, err := config.NewConfig(configName, configPath)
 	if err != nil {
 		log.Fatal(err)
 	}

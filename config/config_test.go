@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func TestNewViperCfg(t *testing.T) {
+func TestNewConfig(t *testing.T) {
 	type args struct {
 		configName string
 		configPath string
@@ -35,7 +35,7 @@ func TestNewViperCfg(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewViperCfg(tt.args.configName, tt.args.configPath)
+			_, err := NewConfig(tt.args.configName, tt.args.configPath)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewPostgresConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -44,8 +44,8 @@ func TestNewViperCfg(t *testing.T) {
 	}
 }
 
-func TestViperCfgNewConsulConfig(t *testing.T) {
-	v, err := NewViperCfg("testConfigForViper", "../testData/")
+func TestConfigNewConsulConfig(t *testing.T) {
+	v, err := NewConfig("testConfigForViper", "../testData/")
 	if err != nil {
 		t.Errorf("Cant start test, err: %v", err)
 	}
@@ -73,7 +73,7 @@ func TestViperCfgNewConsulConfig(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			vcfg := &ViperCfg{
+			vcfg := &Config{
 				v: tt.fields.v,
 			}
 			if got := vcfg.NewConsulConfig(); !reflect.DeepEqual(got, tt.want) {
@@ -83,8 +83,8 @@ func TestViperCfgNewConsulConfig(t *testing.T) {
 	}
 }
 
-func TestViperCfgNewDBConfig(t *testing.T) {
-	v, err := NewViperCfg("testConfigForViper", "../testData/")
+func TestConfigNewDBConfig(t *testing.T) {
+	v, err := NewConfig("testConfigForViper", "../testData/")
 	if err != nil {
 		t.Errorf("Cant start test, err: %v", err)
 	}
@@ -113,7 +113,7 @@ func TestViperCfgNewDBConfig(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			vcfg := &ViperCfg{
+			vcfg := &Config{
 				v: tt.fields.v,
 			}
 			if got := vcfg.NewDBConfig(); !reflect.DeepEqual(got, tt.want) {
@@ -124,7 +124,7 @@ func TestViperCfgNewDBConfig(t *testing.T) {
 }
 
 func TestViperCfgNewLoggerConfig(t *testing.T) {
-	v, err := NewViperCfg("testConfigForViper", "../testData/")
+	v, err := NewConfig("testConfigForViper", "../testData/")
 	if err != nil {
 		t.Errorf("Cant start test, err: %v", err)
 	}
@@ -150,7 +150,7 @@ func TestViperCfgNewLoggerConfig(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			vcfg := &ViperCfg{
+			vcfg := &Config{
 				v: tt.fields.v,
 			}
 			if got := vcfg.NewLoggerConfig(); !reflect.DeepEqual(got, tt.want) {
