@@ -19,7 +19,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// CONSUL ------------------------
 	consulCfg := viper.NewConsulConfig()
 	agentCfg := consulCfg.AgentConfig()
 	clientCfg, err := consulCfg.NewClient()
@@ -32,10 +31,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// -------------------------------
-
-	// POSTGRES ----------------------
-
 	postgresCfg := viper.NewDBConfig()
 	db, err := storage.Connect(postgresCfg)
 
@@ -44,8 +39,6 @@ func main() {
 	}
 
 	defer db.Close()
-
-	// -------------------------------
 
 	for {
 		log.Println(" [INFO] App is running.")
