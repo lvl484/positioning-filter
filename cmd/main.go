@@ -32,6 +32,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	defer consulClient.Agent().ServiceDeregister(consulConfig.ServiceName)
+
 	postgresConfig := viper.NewDBConfig()
 	db, err := storage.Connect(postgresConfig)
 
