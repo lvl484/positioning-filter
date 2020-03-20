@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"time"
 
@@ -8,13 +9,15 @@ import (
 	"github.com/lvl484/positioning-filter/storage"
 )
 
-const (
-	configPath = "../config"
-	configName = "viper.config"
-)
+const ()
 
 func main() {
-	viper, err := config.NewConfig(configName, configPath)
+	configPath := flag.String("cp", "../config", "Path to config file")
+	configName := flag.String("cn", "viper.config", "Name of config file")
+
+	flag.Parse()
+
+	viper, err := config.NewConfig(*configName, *configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
