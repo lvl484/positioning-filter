@@ -19,20 +19,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	consulCfg := viper.NewConsulConfig()
-	agentCfg := consulCfg.AgentConfig()
-	clientCfg, err := consulCfg.NewClient()
+	consulConfig := viper.NewConsulConfig()
+	agentConfig := consulConfig.AgentConfig()
+	clientConfig, err := consulConfig.NewClient()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = consulCfg.ServiceRegister(clientCfg, agentCfg); err != nil {
+	if err = consulConfig.ServiceRegister(clientConfig, agentConfig); err != nil {
 		log.Fatal(err)
 	}
 
-	postgresCfg := viper.NewDBConfig()
-	db, err := storage.Connect(postgresCfg)
+	postgresConfig := viper.NewDBConfig()
+	db, err := storage.Connect(postgresConfig)
 
 	if err != nil {
 		log.Fatal(err)
