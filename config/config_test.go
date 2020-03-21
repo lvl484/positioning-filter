@@ -46,7 +46,7 @@ func TestNewConfig(t *testing.T) {
 func TestConfigNewConsulConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
 	if err != nil {
-		t.Errorf("Cant start test, err: %v", err)
+		t.Fatalf("Cant start test, err: %v", err)
 	}
 
 	want := &consul.Config{
@@ -64,7 +64,7 @@ func TestConfigNewConsulConfig(t *testing.T) {
 func TestConfigNewDBConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
 	if err != nil {
-		t.Errorf("Cant start test, err: %v", err)
+		t.Fatalf("Cant start test, err: %v", err)
 	}
 
 	want := &storage.DBConfig{
@@ -83,7 +83,7 @@ func TestConfigNewDBConfig(t *testing.T) {
 func TestConfigNewLoggerConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
 	if err != nil {
-		t.Errorf("Cant start test, err: %v", err)
+		t.Fatalf("Cant start test, err: %v", err)
 	}
 
 	want := &logger.Config{
