@@ -26,10 +26,12 @@ func main() {
 
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
 	if err = consulConfig.ServiceRegister(consulClient, agentConfig); err != nil {
 		log.Println(err)
+		return
 	}
 
 	defer consulClient.Agent().ServiceDeregister(consulConfig.ServiceName)
@@ -39,6 +41,7 @@ func main() {
 
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
 	defer db.Close()
