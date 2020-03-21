@@ -68,34 +68,17 @@ func TestConfigNewDBConfig(t *testing.T) {
 		t.Errorf("Cant start test, err: %v", err)
 	}
 
-	type fields struct {
-		v *viper.Viper
+	want := &storage.DBConfig{
+		Host: "HOST1",
+		Port: "PORT1",
+		User: "USER1",
+		Pass: "PASSWORD1",
+		DB:   "DB1",
 	}
 
-	test := struct {
-		name   string
-		fields fields
-		want   *storage.DBConfig
-	}{
-		name:   "test",
-		fields: fields{v: v.v},
-		want: &storage.DBConfig{
-			Host: "HOST1",
-			Port: "PORT1",
-			User: "USER1",
-			Pass: "PASSWORD1",
-			DB:   "DB1",
-		},
+	if got := v.NewDBConfig(); !reflect.DeepEqual(got, want) {
+		t.Errorf("ViperCfg.NewConsulConfig() = %v, want %v", got, want)
 	}
-
-	t.Run(test.name, func(t *testing.T) {
-		vcfg := &Config{
-			v: test.fields.v,
-		}
-		if got := vcfg.NewDBConfig(); !reflect.DeepEqual(got, test.want) {
-			t.Errorf("ViperCfg.NewConsulConfig() = %v, want %v", got, test.want)
-		}
-	})
 }
 
 func TestViperCfgNewLoggerConfig(t *testing.T) {
