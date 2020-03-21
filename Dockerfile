@@ -1,5 +1,5 @@
 FROM golang:1.13 as modules
-ADD ./go.mod /m/
+ADD ./go.mod ./go.sum /m/
 RUN cd /m && go mod download
 FROM golang:1.13 as builder
 
