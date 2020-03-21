@@ -2,24 +2,23 @@ package main
 
 import (
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
 
-	sigs := make(chan os.Signal)
+	ConnectedComponents := &structForClose{
+
+		//Put connection variables here
+	}
+
 	done := make(chan bool)
 
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	err := GracefulShutdown(sigs, done)
+	err := ConnectedComponents.GracefulShutdown(done)
 	if err != nil {
 		log.Fatalf("Service graceful shutdown failed: %v", err)
 	}
 
 	<-done
-	log.Println("Service successful shutdown")
+	log.Println("Service successfuly shutdown")
 
 }
