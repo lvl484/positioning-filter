@@ -25,11 +25,11 @@ func main() {
 	consulClient, err := consulConfig.NewClient()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	if err = consulConfig.ServiceRegister(consulClient, agentConfig); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	defer consulClient.Agent().ServiceDeregister(consulConfig.ServiceName)
@@ -38,7 +38,7 @@ func main() {
 	db, err := storage.Connect(postgresConfig)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	defer db.Close()
