@@ -8,7 +8,6 @@ import (
 	"github.com/lvl484/positioning-filter/consul"
 	"github.com/lvl484/positioning-filter/logger"
 	"github.com/lvl484/positioning-filter/storage"
-	"github.com/spf13/viper"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -37,7 +36,7 @@ func TestNewConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := NewConfig(tt.args.configName, tt.args.configPath)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewPostgresConfig() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 		})
@@ -77,7 +76,7 @@ func TestConfigNewDBConfig(t *testing.T) {
 	}
 
 	if got := v.NewDBConfig(); !reflect.DeepEqual(got, want) {
-		t.Errorf("ViperCfg.NewConsulConfig() = %v, want %v", got, want)
+		t.Errorf("Config.NewConsulConfig() = %v, want %v", got, want)
 	}
 }
 
@@ -87,29 +86,12 @@ func TestViperCfgNewLoggerConfig(t *testing.T) {
 		t.Errorf("Cant start test, err: %v", err)
 	}
 
-	type fields struct {
-		v *viper.Viper
+	want := &logger.Config{
+		Host: "HOST3",
+		Port: "PORT3",
 	}
 
-	test := struct {
-		name   string
-		fields fields
-		want   *logger.Config
-	}{
-		name:   "test",
-		fields: fields{v: v.v},
-		want: &logger.Config{
-			Host: "HOST3",
-			Port: "PORT3",
-		},
+	if got := v.NewLoggerConfig(); !reflect.DeepEqual(got, want) {
+		t.Errorf("Config.NewLoggerConfig() = %v, want %v", got, want)
 	}
-
-	t.Run(test.name, func(t *testing.T) {
-		vcfg := &Config{
-			v: test.fields.v,
-		}
-		if got := vcfg.NewLoggerConfig(); !reflect.DeepEqual(got, test.want) {
-			t.Errorf("ViperCfg.NewLoggerConfig() = %v, want %v", got, test.want)
-		}
-	})
 }
