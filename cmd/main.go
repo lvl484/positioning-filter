@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"log"
-	"time"
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
@@ -46,8 +45,20 @@ func main() {
 
 	defer db.Close()
 
-	for {
-		log.Println(" [INFO] App is running.")
-		time.Sleep(5 * time.Second)
+	ConnectedComponents := &structForClose{
+
+		//Put connection variables here
 	}
+
+	done := make(chan bool)
+
+	ConnectedComponents.GracefulShutdown(done)
+	if err != nil {
+		log.Fatalf("Service graceful shutdown failed: %v", err)
+	}
+
+	<-done
+
+	log.Println("Service successfuly shutdown")
+
 }
