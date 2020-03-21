@@ -80,7 +80,7 @@ func TestConfigNewDBConfig(t *testing.T) {
 	}
 }
 
-func TestViperCfgNewLoggerConfig(t *testing.T) {
+func TestConfigNewLoggerConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
 	if err != nil {
 		t.Errorf("Cant start test, err: %v", err)
