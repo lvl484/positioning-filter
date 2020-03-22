@@ -114,12 +114,10 @@ services:
 
   positioning-filter:
       hostname: "positioningfilter"
+      container_name: "positioning-filter"
       ports:
         - "8000:8000"
       build: "./"
-      environment:
-        - SERVICE_NAME=positioning-filter
-        - CONSUL_ADDRESS=consul:8500
       depends_on: 
       - postgres
       - migrator
