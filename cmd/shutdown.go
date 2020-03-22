@@ -32,8 +32,6 @@ func gracefulShutdown(done chan<- bool) error {
 	case <-time.After(shutdownTimeout):
 		log.Println("Overslept")
 		cancel()
-	default:
-		cancel()
 	}
 
 	// Please, replace srv with your server.

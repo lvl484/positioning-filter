@@ -26,16 +26,9 @@ func main() {
 	}
 
 	consulConfig := viper.NewConsulConfig()
-	agentConfig := consulConfig.AgentConfig()
 	consulClient, err := consulConfig.NewClient()
 
 	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	if err = consulConfig.ServiceRegister(consulClient, agentConfig); err != nil {
-		log.Println("there")
 		log.Println(err)
 		return
 	}
