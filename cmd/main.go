@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	configPath := flag.String("cp", "../config", "Path to config file")
+	configPath := flag.String("cp", "../config/", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
 
 	flag.Parse()
