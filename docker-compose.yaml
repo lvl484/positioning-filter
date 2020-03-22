@@ -114,12 +114,17 @@ services:
 
   positioning-filter:
       hostname: "positioningfilter"
+      restart: unless-stopped
       container_name: "positioning-filter"
+      environment:
+      - CONSUL_ADDR=consul-server-bootstrap
       ports:
         - "8000:8000"
       build: "./"
+      command: "./positioning-filter -cp ./config/"
       depends_on: 
       - postgres
       - migrator
       - kafka
       - graylog
+      - consul-server-bootstrap
