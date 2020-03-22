@@ -116,8 +116,6 @@ services:
       hostname: "positioningfilter"
       restart: unless-stopped
       container_name: "positioning-filter"
-      environment:
-      - CONSUL_ADDR=consul-server-bootstrap
       ports:
         - "8000:8000"
       build: "./"
