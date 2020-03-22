@@ -10,15 +10,13 @@ import (
 	"time"
 )
 
-type closer interface {
-	Close() error
-}
-type structForClose struct {
-	components []closer
-}
+const (
+	desiredTimeout  = 5 * time.Second
+	shutdownTimeout = 10 * time.Second
+)
 
 //GracefulShutdown implements releasing all resouces it got from system, finish all request handling and return responses when service stopping.
-func (closing *structForClose) GracefulShutdown(done chan<- bool) error {
+func gracefulShutdown(done chan<- bool) error {
 	sigs := make(chan os.Signal)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -26,11 +24,12 @@ func (closing *structForClose) GracefulShutdown(done chan<- bool) error {
 	sig := <-sigs
 	log.Println("Recieved", sig, "signal")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), desiredTimeout)
+
 	select {
 	case <-ctx.Done():
 		log.Println(ctx.Err())
-	case <-time.After(10 * time.Second):
+	case <-time.After(shutdownTimeout):
 		log.Println("Overslept")
 		cancel()
 	default:
@@ -42,16 +41,15 @@ func (closing *structForClose) GracefulShutdown(done chan<- bool) error {
 		Addr: ":8080",
 	}
 
-	defer func() {
-		for _, component := range closing.components {
-			component.Close()
-		}
+	for _, component := range components {
+		component.Close()
+	}
 
-		if err := server.Shutdown(ctx); err != nil {
-			log.Fatalf("Server shutdown failed:%+v", err)
-		}
-		cancel()
-	}()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed:%+v", err)
+	}
+	cancel()
+
 	close(done)
 	return nil
 }

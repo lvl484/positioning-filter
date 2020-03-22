@@ -2,13 +2,19 @@ package main
 
 import (
 	"flag"
+	"io"
 	"log"
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
+var components []io.Closer
+
 func main() {
+
+	done := make(chan bool)
+
 	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
 
@@ -29,6 +35,7 @@ func main() {
 	}
 
 	if err = consulConfig.ServiceRegister(consulClient, agentConfig); err != nil {
+		log.Println("there")
 		log.Println(err)
 		return
 	}
@@ -43,22 +50,13 @@ func main() {
 		return
 	}
 
-	defer db.Close()
-
-	ConnectedComponents := &structForClose{
-
+	components = append(components,
 		//Put connection variables here
-	}
+		db)
 
-	done := make(chan bool)
-
-	ConnectedComponents.GracefulShutdown(done)
-	if err != nil {
-		log.Fatalf("Service graceful shutdown failed: %v", err)
-	}
+	gracefulShutdown(done)
 
 	<-done
 
 	log.Println("Service successfuly shutdown")
-
 }
