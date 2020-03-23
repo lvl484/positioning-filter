@@ -11,7 +11,6 @@ import (
 )
 
 const (
-	desiredTimeout  = 5 * time.Second
 	shutdownTimeout = 10 * time.Second
 )
 
@@ -24,30 +23,33 @@ func gracefulShutdown(done chan<- bool) error {
 	sig := <-sigs
 	log.Println("Recieved", sig, "signal")
 
-	ctx, cancel := context.WithTimeout(context.Background(), desiredTimeout)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	select {
 	case <-ctx.Done():
 		log.Println(ctx.Err())
+
 	case <-time.After(shutdownTimeout):
 		log.Println("Overslept")
 		cancel()
-	}
+	default:
 
-	// Please, replace srv with your server.
-	server := &http.Server{
-		Addr: ":8080",
-	}
+		// Please, replace srv with your server.
+		server := &http.Server{
+			Addr: ":8080",
+		}
 
-	for _, component := range components {
-		component.Close()
-	}
+		for _, component := range components {
+			component.Close()
+		}
 
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server shutdown failed:%+v", err)
-	}
-	cancel()
+		if err := server.Shutdown(ctx); err != nil {
+			log.Fatalf("Server shutdown failed:%+v", err)
+		}
+		cancel()
 
-	close(done)
+		close(done)
+		return nil
+	}
 	return nil
 }
