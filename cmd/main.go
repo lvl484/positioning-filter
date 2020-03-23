@@ -55,8 +55,6 @@ func main() {
 		return
 	}
 
-	go consumer.Consume()
-
 	defer func() {
 		consumer.Pc.Close()
 		consumer.Master.Close()
