@@ -63,7 +63,9 @@ func main() {
 	sig := <-sigs
 	log.Println("Recieved", sig, "signal")
 
-	gracefulShutdown(done, components)
+	if err := gracefulShutdown(done, components); err != nil {
+		log.Println(err)
+	}
 
 	<-done
 
