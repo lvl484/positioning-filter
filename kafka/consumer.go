@@ -8,7 +8,8 @@ import (
 )
 
 type Consumer struct {
-	pc sarama.PartitionConsumer
+	pc     sarama.PartitionConsumer
+	master sarama.Consumer
 }
 
 func NewConsumer(config *Config) (*Consumer, error) {
@@ -24,7 +25,9 @@ func NewConsumer(config *Config) (*Consumer, error) {
 		return nil, err
 	}
 
-	return &Consumer{pc: consumer}, nil
+	return &Consumer{
+		pc:     consumer,
+		master: master}, nil
 }
 
 func (c Consumer) Consume() {
