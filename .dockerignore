@@ -1,0 +1,18 @@
+#Infrastructure
+infra
+
+#Migration folder
+storage/migrations
+
+# Postgres data
+postgresData
+
+#YML and YAML files
+*.yml
+*.yaml
+
+#Readme
+README.md
+
+
+
