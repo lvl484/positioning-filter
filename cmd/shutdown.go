@@ -18,6 +18,8 @@ const (
 func gracefulShutdown(done chan<- bool) error {
 	sigs := make(chan os.Signal)
 
+	timeout := make(chan bool)
+
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
@@ -25,11 +27,18 @@ func gracefulShutdown(done chan<- bool) error {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	select {
-	case <-ctx.Done():
-		log.Println(ctx.Err())
+	shutdownTime := time.Now().Add(shutdownTimeout)
 
-	case <-time.After(shutdownTimeout):
+	go func() {
+		for time.Now().Before(shutdownTime) {
+			time.Sleep(time.Second)
+			continue
+		}
+		timeout <- true
+	}()
+
+	select {
+	case <-timeout:
 		log.Println("Overslept")
 		cancel()
 	default:
@@ -49,6 +58,7 @@ func gracefulShutdown(done chan<- bool) error {
 		cancel()
 
 		close(done)
+		close(timeout)
 		return nil
 	}
 	return nil
