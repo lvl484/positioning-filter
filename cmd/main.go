@@ -4,6 +4,9 @@ import (
 	"flag"
 	"io"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
@@ -53,7 +56,14 @@ func main() {
 		//Put connection variables here
 		db)
 
-	gracefulShutdown(done)
+	sigs := make(chan os.Signal)
+
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	sig := <-sigs
+	log.Println("Recieved", sig, "signal")
+
+	gracefulShutdown(done, components)
 
 	<-done
 

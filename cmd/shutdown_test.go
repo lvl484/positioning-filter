@@ -1,57 +1,42 @@
 package main
 
 import (
-	"database/sql"
-	"log"
+	"io"
 	"testing"
-
-	"github.com/hashicorp/consul/api"
-	"github.com/hashicorp/consul/connect"
 )
 
-func Test_gracefulShutdown_Successful(t *testing.T) {
-	signal := make(chan bool)
-
-	client, err := api.NewClient(api.DefaultConfig())
-	if err != nil {
-		log.Fatalf("New Client implementation failed:%+v", err)
-	}
-
-	consul, err := connect.NewService("my-service", client)
-	if err != nil {
-		log.Fatalf("New Service implementation failed:%+v", err)
-	}
-
-	components = append(components, consul)
-
-	gracefulShutdown(signal)
-
-	<-signal
-
-	er := gracefulShutdown(signal)
-	if er != nil {
-		t.Error(err)
-	}
-
+type CloserMock struct {
+	name     string
+	expected func() error
 }
 
-func Test_gracefulShutdown_Failed(t *testing.T) {
-	signal := make(chan bool)
+func NewCloserMock(name string, expected func() error) io.Closer {
+	return CloserMock{
+		name:     name,
+		expected: expected,
+	}
+}
 
-	postgresDB, err := sql.Open("driven", "DSN")
+func (cm CloserMock) Close() error {
+	return cm.expected()
+}
+
+func TestGracefulShutdown_Success(t *testing.T) {
+	done := make(chan bool)
+	closers := []io.Closer{
+		NewCloserMock("consul", func() error {
+			return nil
+		}),
+		NewCloserMock("postgres", func() error {
+			return nil
+		}),
+		NewCloserMock("kafka", func() error {
+			return nil
+		}),
+	}
+
+	err := gracefulShutdown(done, closers)
 	if err != nil {
-		log.Fatalf("Database connection failed failed:%+v", err)
+		t.Error(err)
 	}
-
-	components = append(components, postgresDB)
-
-	gracefulShutdown(signal)
-
-	<-signal
-
-	er := gracefulShutdown(signal)
-	if er == nil {
-		t.Error("want error got nil")
-	}
-
 }
