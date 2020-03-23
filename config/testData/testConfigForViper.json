@@ -20,7 +20,8 @@
         "Host": "HOST4",
         "Port": "PORT4",
         "Consumer": {
-            "Topic": "ConsumerTopic"
+            "Topic": "ConsumerTopic",
+            "Partition": 1
         },
         "Producer": {
             "Topic": "ProducerTopic"

@@ -103,11 +103,15 @@ func TestConfigNewKafkaConfig(t *testing.T) {
 		t.Fatalf("Cant start test, err: %v", err)
 	}
 
+	var partition int32
+	partition = 1
+
 	want := &kafka.Config{
-		Host:          "HOST4",
-		Port:          "PORT4",
-		ConsumerTopic: "ConsumerTopic",
-		ProducerTopic: "ProducerTopic",
+		Host:              "HOST4",
+		Port:              "PORT4",
+		ConsumerTopic:     "ConsumerTopic",
+		ConsumerPartition: partition,
+		ProducerTopic:     "ProducerTopic",
 	}
 	if got := v.NewKafkaConfig(); !reflect.DeepEqual(got, want) {
 		t.Errorf("Config.NewKafkaConfig() = %v, want %v", got, want)
