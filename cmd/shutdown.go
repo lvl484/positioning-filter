@@ -32,7 +32,7 @@ func gracefulShutdown(done chan<- bool, components []io.Closer) error {
 		Addr: ":8080",
 	}
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server shutdown failed:%+v", err)
+		log.Printf("Server shutdown failed:%+v", err)
 	}
 
 	for _, component := range components {
