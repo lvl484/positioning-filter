@@ -8,8 +8,8 @@ import (
 )
 
 type Consumer struct {
-	pc     sarama.PartitionConsumer
-	master sarama.Consumer
+	Pc     sarama.PartitionConsumer
+	Master sarama.Consumer
 }
 
 func NewConsumer(config *Config) (*Consumer, error) {
@@ -26,16 +26,16 @@ func NewConsumer(config *Config) (*Consumer, error) {
 	}
 
 	return &Consumer{
-		pc:     consumer,
-		master: master}, nil
+		Pc:     consumer,
+		Master: master}, nil
 }
 
 func (c Consumer) Consume() {
 	for {
 		select {
-		case err := <-c.pc.Errors():
+		case err := <-c.Pc.Errors():
 			log.Println(err)
-		case msg := <-c.pc.Messages():
+		case msg := <-c.Pc.Messages():
 			log.Println(msg)
 		}
 	}
