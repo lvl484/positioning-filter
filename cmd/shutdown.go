@@ -18,31 +18,18 @@ const (
 func gracefulShutdown(done chan<- bool) error {
 	sigs := make(chan os.Signal)
 
-	timeout := make(chan bool)
-
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
 	log.Println("Recieved", sig, "signal")
 
-	ctx, cancel := context.WithCancel(context.Background())
-
-	shutdownTime := time.Now().Add(shutdownTimeout)
-
-	go func() {
-		for time.Now().Before(shutdownTime) {
-			time.Sleep(time.Second)
-			continue
-		}
-		timeout <- true
-	}()
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 
 	select {
-	case <-timeout:
+	case <-ctx.Done():
 		log.Println("Overslept")
 		cancel()
 	default:
-
 		// Please, replace srv with your server.
 		server := &http.Server{
 			Addr: ":8080",
@@ -58,7 +45,6 @@ func gracefulShutdown(done chan<- bool) error {
 		cancel()
 
 		close(done)
-		close(timeout)
 		return nil
 	}
 	return nil
