@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/Shopify/sarama"
 )
@@ -30,13 +29,13 @@ func NewConsumer(config *Config) (*Consumer, error) {
 		Master: master}, nil
 }
 
-func (c Consumer) Consume() {
+func (c Consumer) Consume(errchan chan *sarama.ConsumerError, msgchan chan *sarama.ConsumerMessage) {
 	for {
 		select {
 		case err := <-c.Pc.Errors():
-			log.Println(err)
+			errchan <- err
 		case msg := <-c.Pc.Messages():
-			log.Println(msg)
+			msgchan <- msg
 		}
 	}
 }
