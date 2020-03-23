@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/lvl484/positioning-filter/config"
+	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
@@ -45,6 +46,21 @@ func main() {
 	}
 
 	defer db.Close()
+
+	kafkaConfig := viper.NewKafkaConfig()
+	consumer, err := kafka.NewConsumer(kafkaConfig)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	go consumer.Consume()
+
+	defer func() {
+		consumer.Pc.Close()
+		consumer.Master.Close()
+	}()
 
 	for {
 		log.Println(" [INFO] App is running.")
