@@ -3,7 +3,6 @@ package main
 import (
 	"io"
 	"testing"
-	"time"
 )
 
 type CloserMock struct {
@@ -23,7 +22,7 @@ func (cm CloserMock) Close() error {
 }
 
 func TestGracefulShutdownSuccess(t *testing.T) {
-	timeout := time.Second * 10
+
 	done := make(chan bool)
 	closers := []io.Closer{
 		NewCloserMock("consul", func() error {
@@ -37,7 +36,7 @@ func TestGracefulShutdownSuccess(t *testing.T) {
 		}),
 	}
 
-	err := gracefulShutdown(timeout, done, closers)
+	err := gracefulShutdown(shutdownTimeout, done, closers)
 	if err != nil {
 		t.Error(err)
 	}
