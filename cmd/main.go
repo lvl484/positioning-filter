@@ -21,8 +21,6 @@ var components []io.Closer
 
 func main() {
 
-	done := make(chan bool)
-
 	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
 
@@ -68,11 +66,9 @@ func main() {
 	sig := <-sigs
 	log.Println("Recieved", sig, "signal")
 
-	if err := gracefulShutdown(shutdownTimeout, done, components); err != nil {
+	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
 		log.Println(err)
 	}
-
-	<-done
 
 	log.Println("Service successfuly shutdown")
 }

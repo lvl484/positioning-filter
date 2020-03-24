@@ -23,7 +23,6 @@ func (cm CloserMock) Close() error {
 
 func TestGracefulShutdownSuccess(t *testing.T) {
 
-	done := make(chan bool)
 	closers := []io.Closer{
 		NewCloserMock("consul", func() error {
 			return nil
@@ -36,7 +35,7 @@ func TestGracefulShutdownSuccess(t *testing.T) {
 		}),
 	}
 
-	err := gracefulShutdown(shutdownTimeout, done, closers)
+	err := gracefulShutdown(shutdownTimeout, closers)
 	if err != nil {
 		t.Error(err)
 	}
