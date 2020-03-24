@@ -7,9 +7,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
+)
+
+const (
+	shutdownTimeout = 10 * time.Second
 )
 
 var components []io.Closer
@@ -63,7 +68,7 @@ func main() {
 	sig := <-sigs
 	log.Println("Recieved", sig, "signal")
 
-	if err := gracefulShutdown(done, components); err != nil {
+	if err := gracefulShutdown(shutdownTimeout, done, components); err != nil {
 		log.Println(err)
 	}
 
