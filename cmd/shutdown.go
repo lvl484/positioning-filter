@@ -18,30 +18,28 @@ func gracefulShutdown(done chan<- bool, components []io.Closer) error {
 
 	var errTimeout error
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-
-		server := &http.Server{
-			Addr: ":8080",
-		}
-		if err := server.Shutdown(ctx); err != nil {
-			log.Printf("Server shutdown failed:%+v", err)
-		}
-
-		for _, component := range components {
-			component.Close()
-		}
-
-		cancel()
-
-		if errTimeout == context.DeadlineExceeded {
-			return errTimeout
-		}
-
-		close(done)
-
-		return nil
+	go func() {
+		<-ctx.Done()
+		errTimeout = ctx.Err()
+	}()
+	// Please, replace srv with your server.
+	server := &http.Server{
+		Addr: ":8080",
 	}
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed:%+v", err)
+	}
+
+	for _, component := range components {
+		component.Close()
+	}
+	cancel()
+
+	if errTimeout == context.DeadlineExceeded {
+		return errTimeout
+	}
+
+	close(done)
+
+	return nil
 }
