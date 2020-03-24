@@ -19,15 +19,12 @@ func gracefulShutdown(done chan<- bool, components []io.Closer) error {
 	var errTimeout error
 
 	go func() {
-		for {
-			errTimeout = ctx.Err()
-			if errTimeout == context.DeadlineExceeded {
-				break
-			}
+		select {
+		case <-ctx.Done():
+			return
 		}
 	}()
 
-	// Please, replace srv with your server.
 	server := &http.Server{
 		Addr: ":8080",
 	}
