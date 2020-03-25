@@ -2,16 +2,26 @@ package main
 
 import (
 	"flag"
+	"io"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/lvl484/positioning-filter/config"
-	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
+const (
+	shutdownTimeout = 10 * time.Second
+)
+
+var components []io.Closer
+
 func main() {
-	configPath := flag.String("cp", "../config/", "Path to config file")
+
+	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
 
 	flag.Parse()
@@ -45,23 +55,20 @@ func main() {
 		return
 	}
 
-	defer db.Close()
+	components = append(components,
+		//Put connection variables here
+		db)
 
-	kafkaConfig := viper.NewKafkaConfig()
-	consumer, err := kafka.NewConsumer(kafkaConfig)
+	sigs := make(chan os.Signal)
 
-	if err != nil {
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	sig := <-sigs
+	log.Println("Recieved", sig, "signal")
+
+	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
 		log.Println(err)
-		return
 	}
 
-	defer func() {
-		consumer.Pc.Close()
-		consumer.Master.Close()
-	}()
-
-	for {
-		log.Println(" [INFO] App is running.")
-		time.Sleep(5 * time.Second)
-	}
+	log.Println("Service successfuly shutdown")
 }
