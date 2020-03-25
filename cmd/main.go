@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/lvl484/positioning-filter/config"
+	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
@@ -53,6 +54,14 @@ func main() {
 	if err != nil {
 		log.Println(err)
 		return
+	}
+
+	kafkaConfig := viper.NewKafkaConfig()
+	p, _ := kafka.NewProducer(kafkaConfig)
+	for i := 0; i < 200; i++ {
+		s := string(i)
+		data := []byte{13, 15, 35, 124, 66, 23}
+		p.Produce(s, data)
 	}
 
 	components = append(components,
