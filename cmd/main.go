@@ -63,7 +63,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
-	log.Println("Recieved", sig, "signal")
+	log.Println("Received", sig, "signal")
 
 	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
 		log.Println(err)
