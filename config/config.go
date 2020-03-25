@@ -22,6 +22,12 @@ const (
 	loggerHost = "logger.Host"
 	loggerPort = "logger.Port"
 
+	kafkaHost              = "kafka.Host"
+	kafkaPort              = "kafka.Port"
+	kafkaConsumerTopic     = "kafka.Consumer.Topic"
+	kafkaConsumerPartition = "kafka.Consumer.Partition"
+	kafkaProducerTopic     = "kafka.Producer.Topic"
+
 	consulAddr                   = "consul.Addr"
 	consulServiceName            = "consul.ServiceName"
 	consulServicePort            = "consul.ServicePort"
