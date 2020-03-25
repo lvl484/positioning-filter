@@ -17,14 +17,11 @@ func gracefulShutdown(timeout time.Duration, components []io.Closer) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			component.Close()
 			if err := component.Close(); err != nil {
 				log.Printf("Cant close, err: %v", err)
 			}
 		}
 	}
-
-	cancel()
 
 	return nil
 }
