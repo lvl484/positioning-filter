@@ -103,8 +103,7 @@ func TestConfigNewKafkaConfig(t *testing.T) {
 		t.Fatalf("Cant start test, err: %v", err)
 	}
 
-	var partition int32
-	partition = 1
+	var partition int32 = 1
 
 	want := &kafka.Config{
 		Host:              "HOST4",
