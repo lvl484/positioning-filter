@@ -69,5 +69,5 @@ func main() {
 		log.Println(err)
 	}
 
-	log.Println("Service successfuly shutdown")
+	log.Println("Service successfully shutdown")
 }
