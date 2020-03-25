@@ -22,7 +22,6 @@ func (cm CloserMock) Close() error {
 }
 
 func TestGracefulShutdownSuccess(t *testing.T) {
-
 	closers := []io.Closer{
 		NewCloserMock("consul", func() error {
 			return nil
