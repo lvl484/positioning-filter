@@ -1,9 +1,11 @@
 package kafka
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/Shopify/sarama"
+	"github.com/lvl484/positioning-filter/position"
 )
 
 type Producer struct {
@@ -25,12 +27,22 @@ func NewProducer(config *Config) (*Producer, error) {
 	}, nil
 }
 
-func (p Producer) Produce(userID string, data []byte) {
-	msg := &sarama.ProducerMessage{
-		Topic: p.Config.ProducerTopic,
-		Key:   sarama.StringEncoder(userID),
-		Value: sarama.ByteEncoder(data),
+// Produce message with filtered position to kafka topic "filtered-positions"
+func (p Producer) Produce(pos *position.Position) error {
+	encodedPos, err := json.Marshal(pos)
+	if err != nil {
+		return err
 	}
 
-	p.KafkaProducer.SendMessage(msg)
+	msg := &sarama.ProducerMessage{
+		Topic: p.Config.ProducerTopic,
+		Key:   sarama.StringEncoder(pos.UserID.String()),
+		Value: sarama.ByteEncoder(encodedPos),
+	}
+
+	if _, _, err := p.KafkaProducer.SendMessage(msg); err != nil {
+		return err
+	}
+
+	return nil
 }
