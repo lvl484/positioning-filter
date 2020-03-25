@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/lvl484/positioning-filter/consul"
+	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/logger"
 	"github.com/lvl484/positioning-filter/storage"
 
@@ -70,5 +71,15 @@ func (vcfg *Config) NewConsulConfig() *consul.Config {
 		ServiceName:            vcfg.v.GetString(consulServiceName),
 		ServicePort:            vcfg.v.GetInt(consulServicePort),
 		ServiceHealthCheckPath: vcfg.v.GetString(consulServiceHealthCheckPath),
+	}
+}
+
+func (vcfg *Config) NewKafkaConfig() *kafka.Config {
+	return &kafka.Config{
+		Host:              vcfg.v.GetString(kafkaHost),
+		Port:              vcfg.v.GetString(kafkaPort),
+		ConsumerTopic:     vcfg.v.GetString(kafkaConsumerTopic),
+		ConsumerPartition: vcfg.v.GetInt32(kafkaConsumerPartition),
+		ProducerTopic:     vcfg.v.GetString(kafkaProducerTopic),
 	}
 }
