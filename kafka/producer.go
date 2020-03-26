@@ -1,3 +1,4 @@
+// Package kafka provides producer and consumer to work with kafka topics
 package kafka
 
 import (
