@@ -19,7 +19,7 @@ func NewPostgres(db *sql.DB) *Postgres {
 // AddFilter adds new filter to database
 func (p *Postgres) AddFilter(filter *Filter) error {
 	sqlStatement := "INSERT INTO FILTERS(name,type,configutation,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
-	_, err := p.db.Query(sqlStatement, filter.Name, filter.Type, filter.Configuration, filter.Reversed, filter.UserID)
+	_, err := p.db.Exec(sqlStatement, filter.Name, filter.Type, filter.Configuration, filter.Reversed, filter.UserID)
 
 	return err
 }
@@ -53,7 +53,7 @@ func (p *Postgres) GetFilters(userID uuid.UUID) ([]Filter, error) {
 
 // UpdateFilter updates filter fields by filter name
 func (p *Postgres) UpdateFilter(filter *Filter) error {
-	sqlStatement := "UPDATE FILTERS SET (type,configutation,reversed) VALUES ($1,$2,$3) WHERE name = $4"
+	sqlStatement := "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE name = $4"
 
 	_, err := p.db.Exec(sqlStatement, filter.Type, filter.Configuration, filter.Reversed, filter.Name)
 
