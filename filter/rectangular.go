@@ -1,7 +1,7 @@
 // Package filter provides filter model
 package filter
 
-//RectangularFilter detects the position inside of rectangular area
+//RectangularFilter keeps configuration for filtering inside rectangular area
 type RectangularFilter struct {
 	TopLeftLatitude       float32
 	TopLeftLongtitude     float32
