@@ -11,6 +11,13 @@ type Postgres struct {
 	db *sql.DB
 }
 
+const (
+	addQuery    = "INSERT INTO FILTERS(name,type,configutation,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
+	getQuery    = "SELECT * FROM FILTERS WHERE user_id=$1"
+	updateQuery = "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE name = $4"
+	deleteQuery = "DELETE FROM FILTERS WHERE name=$1"
+)
+
 // NewPostgres returns Postgres with db
 func NewPostgres(db *sql.DB) *Postgres {
 	return &Postgres{db: db}
@@ -18,18 +25,14 @@ func NewPostgres(db *sql.DB) *Postgres {
 
 // AddFilter adds new filter to database
 func (p *Postgres) AddFilter(filter *Filter) error {
-	sqlStatement := "INSERT INTO FILTERS(name,type,configutation,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
-	_, err := p.db.Exec(sqlStatement, filter.Name, filter.Type, filter.Configuration, filter.Reversed, filter.UserID)
-
+	_, err := p.db.Exec(addQuery, filter.Name, filter.Type, filter.Configuration, filter.Reversed, filter.UserID)
 	return err
 }
 
 // GetFilters returns slice of filters relevant to user
 func (p *Postgres) GetFilters(userID uuid.UUID) ([]Filter, error) {
 	filterSlice := []Filter{}
-
-	sqlStatement := "SELECT * FROM FILTERS WHERE user_id=$1"
-	r, err := p.db.Query(sqlStatement, userID)
+	r, err := p.db.Query(getQuery, userID)
 
 	if err != nil {
 		return nil, err
@@ -53,15 +56,13 @@ func (p *Postgres) GetFilters(userID uuid.UUID) ([]Filter, error) {
 
 // UpdateFilter updates filter fields by filter name
 func (p *Postgres) UpdateFilter(filter *Filter) error {
-	sqlStatement := "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE name = $4"
-
-	_, err := p.db.Exec(sqlStatement, filter.Type, filter.Configuration, filter.Reversed, filter.Name)
+	_, err := p.db.Exec(updateQuery, filter.Type, filter.Configuration, filter.Reversed, filter.Name)
 
 	return err
 }
 
 // DeleteFilter deletes filter by name
 func (p *Postgres) DeleteFilter(filterName string) error {
-	_, err := p.db.Exec("DELETE FROM FILTERS WHERE name=$1", filterName)
+	_, err := p.db.Exec(deleteQuery, filterName)
 	return err
 }
