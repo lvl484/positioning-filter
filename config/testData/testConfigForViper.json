@@ -19,10 +19,6 @@
     "kafka": {
         "Host": "HOST4",
         "Port": "PORT4",
-        "Consumer": {
-            "Topic": "ConsumerTopic",
-            "Partition": 1
-        },
         "Producer": {
             "Topic": "ProducerTopic"
         }

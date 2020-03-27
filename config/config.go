@@ -22,11 +22,9 @@ const (
 	loggerHost = "logger.Host"
 	loggerPort = "logger.Port"
 
-	kafkaHost              = "kafka.Host"
-	kafkaPort              = "kafka.Port"
-	kafkaConsumerTopic     = "kafka.Consumer.Topic"
-	kafkaConsumerPartition = "kafka.Consumer.Partition"
-	kafkaProducerTopic     = "kafka.Producer.Topic"
+	kafkaHost          = "kafka.Host"
+	kafkaPort          = "kafka.Port"
+	kafkaProducerTopic = "kafka.Producer.Topic"
 
 	consulAddr                   = "consul.Addr"
 	consulServiceName            = "consul.ServiceName"
@@ -82,10 +80,8 @@ func (vcfg *Config) NewConsulConfig() *consul.Config {
 
 func (vcfg *Config) NewKafkaConfig() *kafka.Config {
 	return &kafka.Config{
-		Host:              vcfg.v.GetString(kafkaHost),
-		Port:              vcfg.v.GetString(kafkaPort),
-		ConsumerTopic:     vcfg.v.GetString(kafkaConsumerTopic),
-		ConsumerPartition: vcfg.v.GetInt32(kafkaConsumerPartition),
-		ProducerTopic:     vcfg.v.GetString(kafkaProducerTopic),
+		Host:          vcfg.v.GetString(kafkaHost),
+		Port:          vcfg.v.GetString(kafkaPort),
+		ProducerTopic: vcfg.v.GetString(kafkaProducerTopic),
 	}
 }
