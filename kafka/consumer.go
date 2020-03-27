@@ -1,41 +1,56 @@
+// Package kafka provides producer and consumer to work with kafka topics
 package kafka
 
 import (
+	"context"
 	"fmt"
+	"log"
 
 	"github.com/Shopify/sarama"
+	"github.com/lvl484/positioning-filter/position"
 )
 
+const kafkaVersion = "2.4.1"
+
 type Consumer struct {
-	Pc     sarama.PartitionConsumer
-	Master sarama.Consumer
+	ConsumerGroup sarama.ConsumerGroup
+	Config        *Config
 }
 
 func NewConsumer(config *Config) (*Consumer, error) {
 	addr := []string{fmt.Sprintf("%v:%v", config.Host, config.Port)}
-	master, err := sarama.NewConsumer(addr, nil)
+	version, err := sarama.ParseKafkaVersion(kafkaVersion)
 
 	if err != nil {
-		return nil, err
+		log.Println(err)
 	}
 
-	consumer, err := master.ConsumePartition(config.ConsumerTopic, config.ConsumerPartition, sarama.OffsetNewest)
+	saramaConfig := sarama.NewConfig()
+	saramaConfig.Version = version
+
+	consumerGroup, err := sarama.NewConsumerGroup(addr, config.ConsumerGroupID, saramaConfig)
+
 	if err != nil {
 		return nil, err
 	}
 
 	return &Consumer{
-		Pc:     consumer,
-		Master: master}, nil
+		ConsumerGroup: consumerGroup,
+		Config:        config,
+	}, nil
 }
 
-func (c Consumer) Consume(errchan chan *sarama.ConsumerError, msgchan chan *sarama.ConsumerMessage) {
+func (c Consumer) Consume(msgChan chan position.Position) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	handler := ConsumerGroupHandler{
+		Msg: msgChan,
+	}
+
 	for {
-		select {
-		case err := <-c.Pc.Errors():
-			errchan <- err
-		case msg := <-c.Pc.Messages():
-			msgchan <- msg
+		if err := c.ConsumerGroup.Consume(ctx, []string{c.Config.ConsumerTopic}, handler); err != nil {
+			log.Println(err)
 		}
 	}
 }

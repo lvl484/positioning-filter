@@ -1,4 +1,4 @@
-FROM consul:1.7.1
+FROM consul:1.7.2
 
 COPY agent-config.json /consul/configs/
 

@@ -19,8 +19,8 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_ADVERTISED_HOST_NAME=kafka
       - KAFKA_ADVERTIZED_PORT=9092
-      - KAFKA_CREATE_TOPICS="positions:4:1,matched-positions:4:1"
       - KAFKA_CREATE_TOPICS_SEPARATOR=","
+      - KAFKA_CREATE_TOPICS="positions:4:1,matched-positions:4:1"    
     depends_on:
       - zookeeper
 
@@ -72,14 +72,14 @@ services:
     - consul-server-bootstrap
 
   consul-server-1: &consul-server
-    image: consul:1.7.1
+    image: consul:1.7.2
     command: "agent -server -retry-join consul-server-bootstrap -client 0.0.0.0"
 
   consul-server-2:
     <<: *consul-server
 
   consul-server-bootstrap:
-    image: consul:1.7.1
+    image: consul:1.7.2
     ports:
       - "8400:8400"
       - "8500:8500"
@@ -119,7 +119,7 @@ services:
       ports:
         - "8000:8000"
       build: "./"
-      command: "./positioning-filter -cp ./config/"
+      command: /bin/sh -c "sleep 1m && ./positioning-filter -cp ./config/"
       depends_on: 
       - postgres
       - migrator

@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/lvl484/positioning-filter/config"
+	"github.com/lvl484/positioning-filter/kafka"
+	"github.com/lvl484/positioning-filter/position"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
@@ -53,6 +55,27 @@ func main() {
 		log.Println(err)
 		return
 	}
+
+	kafkaConfig := viper.NewKafkaConfig()
+	consumer, err := kafka.NewConsumer(kafkaConfig)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	producer, err := kafka.NewProducer(kafkaConfig)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	consumerMsgChan := make(chan position.Position)
+	producerMsgChan := make(chan position.Position)
+
+	go consumer.Consume(consumerMsgChan)
+	go producer.Produce(producerMsgChan)
 
 	components = append(components,
 		//Put connection variables here
