@@ -1,5 +1,5 @@
-// Package filter provides filter model
-package filter
+// Package repository provides filter model
+package repository
 
 import (
 	"encoding/json"

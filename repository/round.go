@@ -1,5 +1,5 @@
-// Package filter provides filter model
-package filter
+// Package repository provides filter model
+package repository
 
 // RoundFilter keeps configuration for filtering inside round area
 type RoundFilter struct {

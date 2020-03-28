@@ -1,5 +1,5 @@
-// Package filter provides filter model
-package filter
+// Package repository provides filter model
+package repository
 
 import (
 	"database/sql"
@@ -11,17 +11,23 @@ type Postgres struct {
 	db *sql.DB
 }
 
+// NewPostgres returns Postgres with db
+func NewPostgres(db *sql.DB) *Postgres {
+	return &Postgres{db: db}
+}
+
+type FiltersGUD interface {
+	GetFilters() ([]Filter, error)
+	UpdateFilter() error
+	DeleteFilter() error
+}
+
 const (
 	addQuery    = "INSERT INTO FILTERS(name,type,configutation,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
 	getQuery    = "SELECT * FROM FILTERS WHERE user_id=$1"
 	updateQuery = "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE name = $4"
 	deleteQuery = "DELETE FROM FILTERS WHERE name=$1"
 )
-
-// NewPostgres returns Postgres with db
-func NewPostgres(db *sql.DB) *Postgres {
-	return &Postgres{db: db}
-}
 
 // AddFilter adds new filter to database
 func (p *Postgres) AddFilter(filter *Filter) error {

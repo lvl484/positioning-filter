@@ -1,5 +1,5 @@
-// Package filter provides filter model
-package filter
+// Package repository provides filter model
+package repository
 
 //RectangularFilter keeps configuration for filtering inside rectangular area
 type RectangularFilter struct {
