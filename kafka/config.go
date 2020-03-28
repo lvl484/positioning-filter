@@ -4,6 +4,7 @@ package kafka
 type Config struct {
 	Host            string
 	Port            string
+	Version         string
 	ConsumerTopic   string
 	ConsumerGroupID string
 	ProducerTopic   string

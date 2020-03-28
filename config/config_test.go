@@ -106,6 +106,7 @@ func TestConfigNewKafkaConfig(t *testing.T) {
 	want := &kafka.Config{
 		Host:            "HOST4",
 		Port:            "PORT4",
+		Version:         "V4",
 		ConsumerTopic:   "ConsumerTopic",
 		ConsumerGroupID: "ConsumerGroupID",
 		ProducerTopic:   "ProducerTopic",

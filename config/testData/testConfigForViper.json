@@ -19,6 +19,7 @@
     "kafka": {
         "Host": "HOST4",
         "Port": "PORT4",
+        "Version":"V4",
         "Consumer": {
             "Topic": "ConsumerTopic",
             "GroupID":"ConsumerGroupID"

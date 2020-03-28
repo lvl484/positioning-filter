@@ -11,7 +11,6 @@ import (
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/kafka"
-	"github.com/lvl484/positioning-filter/position"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
@@ -64,6 +63,8 @@ func main() {
 		return
 	}
 
+	filters := repository.NewFiltersRepository(db) //TODO: implement repository package
+	matcher := matcher.NewMatcher(filters)         //TODO: implement matcher package
 	producer, err := kafka.NewProducer(kafkaConfig)
 
 	if err != nil {
@@ -71,11 +72,7 @@ func main() {
 		return
 	}
 
-	consumerMsgChan := make(chan position.Position)
-	producerMsgChan := make(chan position.Position)
-
-	go consumer.Consume(consumerMsgChan)
-	go producer.Produce(producerMsgChan)
+	go consumer.Consume(matcher, producer)
 
 	components = append(components,
 		//Put connection variables here

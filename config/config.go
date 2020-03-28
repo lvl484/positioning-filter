@@ -24,6 +24,7 @@ const (
 
 	kafkaHost            = "kafka.Host"
 	kafkaPort            = "kafka.Port"
+	kafkaVersion         = "kafka.Version"
 	kafkaConsumerTopic   = "kafka.Consumer.Topic"
 	kafkaConsumerGroupID = "kafka.Consumer.GroupID"
 	kafkaProducerTopic   = "kafka.Producer.Topic"
@@ -84,6 +85,7 @@ func (vcfg *Config) NewKafkaConfig() *kafka.Config {
 	return &kafka.Config{
 		Host:            vcfg.v.GetString(kafkaHost),
 		Port:            vcfg.v.GetString(kafkaPort),
+		Version:         vcfg.v.GetString(kafkaVersion),
 		ConsumerTopic:   vcfg.v.GetString(kafkaConsumerTopic),
 		ConsumerGroupID: vcfg.v.GetString(kafkaConsumerGroupID),
 		ProducerTopic:   vcfg.v.GetString(kafkaProducerTopic),

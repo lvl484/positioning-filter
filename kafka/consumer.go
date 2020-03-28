@@ -7,26 +7,26 @@ import (
 	"log"
 
 	"github.com/Shopify/sarama"
-	"github.com/lvl484/positioning-filter/position"
+	"github.com/lvl484/positioning-filter/matcher"
 )
-
-const kafkaVersion = "2.4.1"
 
 type Consumer struct {
 	ConsumerGroup sarama.ConsumerGroup
 	Config        *Config
+	closeChan     chan bool
 }
 
 func NewConsumer(config *Config) (*Consumer, error) {
 	addr := []string{fmt.Sprintf("%v:%v", config.Host, config.Port)}
-	version, err := sarama.ParseKafkaVersion(kafkaVersion)
+	version, err := sarama.ParseKafkaVersion(config.Version)
 
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
 	saramaConfig := sarama.NewConfig()
 	saramaConfig.Version = version
+	saramaConfig.Consumer.Return.Errors = true
 
 	consumerGroup, err := sarama.NewConsumerGroup(addr, config.ConsumerGroupID, saramaConfig)
 
@@ -34,23 +34,39 @@ func NewConsumer(config *Config) (*Consumer, error) {
 		return nil, err
 	}
 
+	closeChan := make(chan bool)
+
 	return &Consumer{
 		ConsumerGroup: consumerGroup,
 		Config:        config,
+		closeChan:     closeChan,
 	}, nil
 }
 
-func (c Consumer) Consume(msgChan chan position.Position) {
+func (c *Consumer) Consume(matcher matcher.Matcher, producer Producer) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	handler := ConsumerGroupHandler{
-		Msg: msgChan,
-	}
+	handler := newConsumerGroupHandler(matcher, producer)
 
 	for {
-		if err := c.ConsumerGroup.Consume(ctx, []string{c.Config.ConsumerTopic}, handler); err != nil {
+		select {
+		case _, ok := <-c.closeChan:
+			if !ok {
+				return
+			}
+		case err := <-c.ConsumerGroup.Errors():
 			log.Println(err)
+		default:
+			if err := c.ConsumerGroup.Consume(ctx, []string{c.Config.ConsumerTopic}, handler); err != nil {
+				log.Println(err)
+			}
 		}
 	}
+}
+
+// Close closes Consume func. Returns nil error to implement io.Closer interface
+func (c *Consumer) Close() error {
+	close(c.closeChan)
+	return nil
 }
