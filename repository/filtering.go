@@ -3,7 +3,6 @@ package repository
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/google/uuid"
 )
@@ -15,15 +14,15 @@ const (
 	deleteQuery = "DELETE FROM FILTERS WHERE user_id=$1 AND name=$2"
 )
 
-type filtersRepo struct {
-	db *sql.DB
-}
-
 type Filters interface {
 	AllByUser(userID uuid.UUID) ([]*Filter, error)
 	Add(filter *Filter) error
 	Update(filter *Filter) error
 	Delete(userID uuid.UUID, name string) error
+}
+
+type filtersRepo struct {
+	db *sql.DB
 }
 
 func NewFiltersRepository(db *sql.DB) Filters {
@@ -47,12 +46,13 @@ func (p *filtersRepo) AllByUser(userID uuid.UUID) ([]*Filter, error) {
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
-		var f *Filter
+		f := new(Filter)
 		err = rows.Scan(&f.Name, &f.Type, &f.Configuration, &f.Reversed, &f.UserID)
 		if err != nil {
-			log.Println(err)
-			break
+			return nil, err
 		}
 
 		filters = append(filters, f)
