@@ -11,6 +11,7 @@ import (
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/kafka"
+	"github.com/lvl484/positioning-filter/repository"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
@@ -63,8 +64,8 @@ func main() {
 		return
 	}
 
-	filters := repository.NewFiltersRepository(db) //TODO: implement repository package
-	matcher := matcher.NewMatcher(filters)         //TODO: implement matcher package
+	filters := repository.NewFiltersRepository(db)
+	matcher := matcher.NewMatcher(filters) //TODO: implement matcher package
 	producer, err := kafka.NewProducer(kafkaConfig)
 
 	if err != nil {
