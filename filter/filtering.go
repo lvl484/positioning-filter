@@ -29,9 +29,9 @@ func (p *Postgres) AddFilter(filter *Filter) error {
 	return err
 }
 
-// GetFilters returns slice of filters relevant to user
+// GetFilters returns set of filters relevant to user
 func (p *Postgres) GetFilters(userID uuid.UUID) ([]Filter, error) {
-	filterSlice := []Filter{}
+	filtersSet := []Filter{}
 	r, err := p.db.Query(getQuery, userID)
 
 	if err != nil {
@@ -48,10 +48,10 @@ func (p *Postgres) GetFilters(userID uuid.UUID) ([]Filter, error) {
 			continue
 		}
 
-		filterSlice = append(filterSlice, f)
+		filtersSet = append(filtersSet, f)
 	}
 
-	return filterSlice, nil
+	return filtersSet, nil
 }
 
 // UpdateFilter updates filter fields by filter name
