@@ -9,6 +9,9 @@ import (
 	"github.com/lvl484/positioning-filter/position"
 )
 
+// Producer is interface that wraps two methods
+// Produce encode position into slice of bytes and send it as sarama.ProducerMessage to kafka broker
+// Close shuts down the producer and waits for any buffered messages to be flushed
 type Producer interface {
 	Produce(position.Position) error
 	Close() error
@@ -19,6 +22,7 @@ type producer struct {
 	Config        *Config
 }
 
+// NewProducer returns struct that implement interface Producer
 func NewProducer(config *Config) (Producer, error) {
 	addr := []string{fmt.Sprintf("%v:%v", config.Host, config.Port)}
 	saramaProducer, err := sarama.NewSyncProducer(addr, nil)
