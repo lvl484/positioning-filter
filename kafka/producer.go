@@ -58,6 +58,7 @@ func (p *producer) Produce(pos position.Position) error {
 	return nil
 }
 
+// Close shuts down the producer and waits for any buffered messages to be flushed
 func (p *producer) Close() error {
 	return p.KafkaProducer.Close()
 }
