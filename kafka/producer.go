@@ -33,7 +33,7 @@ func NewProducer(config *Config) (Producer, error) {
 	}, nil
 }
 
-// Produce message with filtered position to kafka topic "filtered-positions"
+// Produce sarama.ProducerMessage with filtered position to kafka topic "filtered-positions"
 func (p *producer) Produce(pos position.Position) error {
 	encodedPos, err := json.Marshal(pos)
 
