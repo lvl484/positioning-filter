@@ -9,6 +9,7 @@ import (
 	saramaMocks "github.com/Shopify/sarama/mocks"
 	"github.com/google/uuid"
 	"github.com/lvl484/positioning-filter/position"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewProducerFail(t *testing.T) {
@@ -18,14 +19,9 @@ func TestNewProducerFail(t *testing.T) {
 	}
 
 	got, err := NewProducer(config)
-	if err == nil {
-		t.Errorf("NewProducer() got nil, want error")
-		return
-	}
 
-	if got != nil {
-		t.Errorf("NewProducer() got Producer, want nil")
-	}
+	assert.NotNil(t, err)
+	assert.Nil(t, got)
 }
 
 // TestNewProducerIntegrationSuccess will be passed only if kafka broker is started on localhost:9092
@@ -36,13 +32,8 @@ func TestNewProducerIntegrationSuccess(t *testing.T) {
 	}
 	got, err := NewProducer(config)
 
-	if err != nil {
-		t.Errorf("NewProducer() got %v, want nil", err)
-	}
-
-	if got == nil {
-		t.Errorf("NewProducer() got nil, want Producer")
-	}
+	assert.Nil(t, err)
+	assert.NotNil(t, got)
 }
 
 func TestProducerClose(t *testing.T) {
@@ -51,9 +42,8 @@ func TestProducerClose(t *testing.T) {
 		KafkaProducer: kafkaProducer,
 	}
 
-	if err := producer.Close(); err != nil {
-		t.Errorf("Close() got %v, want nil", err)
-	}
+	err := producer.Close()
+	assert.Nil(t, err)
 }
 
 func TestProducerProduceSuccess(t *testing.T) {
@@ -69,9 +59,8 @@ func TestProducerProduceSuccess(t *testing.T) {
 	kafkaProducer.ExpectSendMessageAndSucceed()
 
 	var p position.Position
-	if err := producer.Produce(p); err != nil {
-		t.Errorf("Producer.Produce() got %v, want nil", err)
-	}
+	err := producer.Produce(p)
+	assert.Nil(t, err)
 }
 
 func TestProducerProduceFail(t *testing.T) {
@@ -89,9 +78,8 @@ func TestProducerProduceFail(t *testing.T) {
 	kafkaProducer.ExpectSendMessageAndFail(testError)
 
 	var p position.Position
-	if err := producer.Produce(p); err == nil {
-		t.Errorf("Producer.Produce() got nil, want %v", testError)
-	}
+	err := producer.Produce(p)
+	assert.EqualError(t, err, "Test error for Producer")
 }
 
 func TestProducerProduceFailEncode(t *testing.T) {
@@ -104,15 +92,12 @@ func TestProducerProduceFailEncode(t *testing.T) {
 		Config:        config,
 	}
 
-	testError := errors.New("Test error for json.Marshal in Produce()")
-
 	lat := float32(math.Inf(1))
 	p := position.Position{
 		UserID:   uuid.New(),
 		Latitude: lat,
 	}
 
-	if err := producer.Produce(p); err == nil {
-		t.Errorf("Producer.Produce() got nil, want %v", testError)
-	}
+	err := producer.Produce(p)
+	assert.NotNil(t, err)
 }
