@@ -2,13 +2,13 @@
 package config
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/lvl484/positioning-filter/consul"
 	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/logger"
 	"github.com/lvl484/positioning-filter/storage"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -46,9 +46,7 @@ func TestNewConfig(t *testing.T) {
 
 func TestConfigNewConsulConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
-	if err != nil {
-		t.Fatalf("Cant start test, err: %v", err)
-	}
+	assert.Nil(t, err)
 
 	want := &consul.Config{
 		Address:                "HOST2",
@@ -57,16 +55,13 @@ func TestConfigNewConsulConfig(t *testing.T) {
 		ServiceHealthCheckPath: "HEALTH2",
 	}
 
-	if got := v.NewConsulConfig(); !reflect.DeepEqual(got, want) {
-		t.Errorf("Config.NewConsulConfig() = %v, want %v", got, want)
-	}
+	got := v.NewConsulConfig()
+	assert.Equal(t, want, got)
 }
 
 func TestConfigNewDBConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
-	if err != nil {
-		t.Fatalf("Cant start test, err: %v", err)
-	}
+	assert.Nil(t, err)
 
 	want := &storage.DBConfig{
 		Host: "HOST1",
@@ -76,32 +71,26 @@ func TestConfigNewDBConfig(t *testing.T) {
 		DB:   "DB1",
 	}
 
-	if got := v.NewDBConfig(); !reflect.DeepEqual(got, want) {
-		t.Errorf("Config.NewConsulConfig() = %v, want %v", got, want)
-	}
+	got := v.NewDBConfig()
+	assert.Equal(t, want, got)
 }
 
 func TestConfigNewLoggerConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
-	if err != nil {
-		t.Fatalf("Cant start test, err: %v", err)
-	}
+	assert.Nil(t, err)
 
 	want := &logger.Config{
 		Host: "HOST3",
 		Port: "PORT3",
 	}
 
-	if got := v.NewLoggerConfig(); !reflect.DeepEqual(got, want) {
-		t.Errorf("Config.NewLoggerConfig() = %v, want %v", got, want)
-	}
+	got := v.NewLoggerConfig()
+	assert.Equal(t, want, got)
 }
 
 func TestConfigNewKafkaConfig(t *testing.T) {
 	v, err := NewConfig("testConfigForViper", "./testData/")
-	if err != nil {
-		t.Fatalf("Cant start test, err: %v", err)
-	}
+	assert.Nil(t, err)
 
 	want := &kafka.Config{
 		Host:            "HOST4",
@@ -111,7 +100,6 @@ func TestConfigNewKafkaConfig(t *testing.T) {
 		ConsumerGroupID: "ConsumerGroupID",
 		ProducerTopic:   "ProducerTopic",
 	}
-	if got := v.NewKafkaConfig(); !reflect.DeepEqual(got, want) {
-		t.Errorf("Config.NewKafkaConfig() = %v, want %v", got, want)
-	}
+	got := v.NewKafkaConfig()
+	assert.Equal(t, want, got)
 }
