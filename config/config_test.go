@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/lvl484/positioning-filter/consul"
+	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/logger"
 	"github.com/lvl484/positioning-filter/storage"
 )
@@ -93,5 +94,24 @@ func TestConfigNewLoggerConfig(t *testing.T) {
 
 	if got := v.NewLoggerConfig(); !reflect.DeepEqual(got, want) {
 		t.Errorf("Config.NewLoggerConfig() = %v, want %v", got, want)
+	}
+}
+
+func TestConfigNewKafkaConfig(t *testing.T) {
+	v, err := NewConfig("testConfigForViper", "./testData/")
+	if err != nil {
+		t.Fatalf("Cant start test, err: %v", err)
+	}
+
+	want := &kafka.Config{
+		Host:            "HOST4",
+		Port:            "PORT4",
+		Version:         "V4",
+		ConsumerTopic:   "ConsumerTopic",
+		ConsumerGroupID: "ConsumerGroupID",
+		ProducerTopic:   "ProducerTopic",
+	}
+	if got := v.NewKafkaConfig(); !reflect.DeepEqual(got, want) {
+		t.Errorf("Config.NewKafkaConfig() = %v, want %v", got, want)
 	}
 }
