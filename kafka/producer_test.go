@@ -2,6 +2,7 @@
 package kafka
 
 import (
+	"encoding/json"
 	"errors"
 	"math"
 	"testing"
@@ -75,9 +76,17 @@ func TestProducerProduceFail(t *testing.T) {
 
 	testError := errors.New("Test error for Producer")
 
-	kafkaProducer.ExpectSendMessageAndFail(testError)
-
 	var p position.Position
+
+	b1, _ := json.Marshal(p)
+
+	checker := func(b2 []byte) error {
+		assert.Equal(t, b1, b2)
+		return nil
+	}
+
+	kafkaProducer.ExpectSendMessageWithCheckerFunctionAndFail(checker, testError)
+
 	err := producer.Produce(p)
 	assert.EqualError(t, err, "Test error for Producer")
 }
