@@ -18,8 +18,9 @@ const (
 	postgresPass = "postgres.Pass"
 	postgresDB   = "postgres.DB"
 
-	loggerHost = "logger.Host"
-	loggerPort = "logger.Port"
+	loggerHost   = "logger.Host"
+	loggerPort   = "logger.Port"
+	loggerOutput = "logger.Output"
 
 	consulAddr                   = "consul.Addr"
 	consulServiceName            = "consul.ServiceName"
@@ -58,8 +59,9 @@ func (vcfg *Config) NewDBConfig() *storage.DBConfig {
 // NewLoggerConfig returns pointer to logger.Config with data read from viper.config.json
 func (vcfg *Config) NewLoggerConfig() *logger.Config {
 	return &logger.Config{
-		Host: vcfg.v.GetString(loggerHost),
-		Port: vcfg.v.GetString(loggerPort),
+		Host:   vcfg.v.GetString(loggerHost),
+		Port:   vcfg.v.GetString(loggerPort),
+		Output: vcfg.v.GetString(loggerOutput),
 	}
 }
 

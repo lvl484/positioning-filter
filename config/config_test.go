@@ -89,6 +89,7 @@ func TestConfigNewLoggerConfig(t *testing.T) {
 	want := &logger.Config{
 		Host: "HOST3",
 		Port: "PORT3",
+		Output:"OUTPUT3"
 	}
 
 	if got := v.NewLoggerConfig(); !reflect.DeepEqual(got, want) {
