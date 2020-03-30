@@ -57,10 +57,19 @@ func TestProducerProduceSuccess(t *testing.T) {
 		Config:        config,
 	}
 
-	kafkaProducer.ExpectSendMessageAndSucceed()
-
 	var p position.Position
-	err := producer.Produce(p)
+
+	b1, err := json.Marshal(p)
+	assert.Nil(t, err)
+
+	checker := func(b2 []byte) error {
+		assert.Equal(t, b1, b2)
+		return nil
+	}
+
+	kafkaProducer.ExpectSendMessageWithCheckerFunctionAndSucceed(checker)
+
+	err = producer.Produce(p)
 	assert.Nil(t, err)
 }
 
@@ -78,7 +87,8 @@ func TestProducerProduceFail(t *testing.T) {
 
 	var p position.Position
 
-	b1, _ := json.Marshal(p)
+	b1, err := json.Marshal(p)
+	assert.Nil(t, err)
 
 	checker := func(b2 []byte) error {
 		assert.Equal(t, b1, b2)
@@ -87,7 +97,7 @@ func TestProducerProduceFail(t *testing.T) {
 
 	kafkaProducer.ExpectSendMessageWithCheckerFunctionAndFail(checker, testError)
 
-	err := producer.Produce(p)
+	err = producer.Produce(p)
 	assert.EqualError(t, err, "Test error for Producer")
 }
 
