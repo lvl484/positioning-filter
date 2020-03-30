@@ -16,5 +16,17 @@
         "Host": "HOST3",
         "Port": "PORT3",
         "Output":"OUTPUT3"
+    },
+    "kafka": {
+        "Host": "HOST4",
+        "Port": "PORT4",
+        "Version":"V4",
+        "Consumer": {
+            "Topic": "ConsumerTopic",
+            "GroupID":"ConsumerGroupID"
+        },
+        "Producer": {
+            "Topic": "ProducerTopic"
+        }
     }
 }
