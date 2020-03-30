@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/lvl484/positioning-filter/consul"
+	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/logger"
 	"github.com/lvl484/positioning-filter/storage"
 
@@ -20,6 +21,13 @@ const (
 
 	loggerHost = "logger.Host"
 	loggerPort = "logger.Port"
+
+	kafkaHost            = "kafka.Host"
+	kafkaPort            = "kafka.Port"
+	kafkaVersion         = "kafka.Version"
+	kafkaConsumerTopic   = "kafka.Consumer.Topic"
+	kafkaConsumerGroupID = "kafka.Consumer.GroupID"
+	kafkaProducerTopic   = "kafka.Producer.Topic"
 
 	consulAddr                   = "consul.Addr"
 	consulServiceName            = "consul.ServiceName"
@@ -70,5 +78,17 @@ func (vcfg *Config) NewConsulConfig() *consul.Config {
 		ServiceName:            vcfg.v.GetString(consulServiceName),
 		ServicePort:            vcfg.v.GetInt(consulServicePort),
 		ServiceHealthCheckPath: vcfg.v.GetString(consulServiceHealthCheckPath),
+	}
+}
+
+// NewKafkaConfig returns pointer to kafka.Config with data read from viper.config.json
+func (vcfg *Config) NewKafkaConfig() *kafka.Config {
+	return &kafka.Config{
+		Host:            vcfg.v.GetString(kafkaHost),
+		Port:            vcfg.v.GetString(kafkaPort),
+		Version:         vcfg.v.GetString(kafkaVersion),
+		ConsumerTopic:   vcfg.v.GetString(kafkaConsumerTopic),
+		ConsumerGroupID: vcfg.v.GetString(kafkaConsumerGroupID),
+		ProducerTopic:   vcfg.v.GetString(kafkaProducerTopic),
 	}
 }
