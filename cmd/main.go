@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/lvl484/positioning-filter/logger"
+
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
 )
@@ -29,6 +31,12 @@ func main() {
 	viper, err := config.NewConfig(*configName, *configPath)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	loggerConfig := viper.NewLoggerConfig()
+	if err := logger.NewLogger(loggerConfig); err != nil {
+		log.Println(err)
+		return
 	}
 
 	consulConfig := viper.NewConsulConfig()
