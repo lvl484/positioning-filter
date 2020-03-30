@@ -6,6 +6,7 @@ import (
 	"errors"
 	"math"
 	"testing"
+	"time"
 
 	saramaMocks "github.com/Shopify/sarama/mocks"
 	"github.com/google/uuid"
@@ -57,7 +58,17 @@ func TestProducerProduceSuccess(t *testing.T) {
 		Config:        config,
 	}
 
-	var p position.Position
+	var latitude float32 = 1.666
+
+	var longitude float32 = 1.333
+
+	p := position.Position{
+		UserID:    uuid.New(),
+		Latitude:  latitude,
+		Longitude: longitude,
+		Timestamp: time.Now(),
+		Arrival:   time.Now().Add(time.Second),
+	}
 
 	b1, err := json.Marshal(p)
 	assert.Nil(t, err)
@@ -85,7 +96,17 @@ func TestProducerProduceFail(t *testing.T) {
 
 	testError := errors.New("Test error for Producer")
 
-	var p position.Position
+	var latitude float32 = 1.666
+
+	var longitude float32 = 1.333
+
+	p := position.Position{
+		UserID:    uuid.New(),
+		Latitude:  latitude,
+		Longitude: longitude,
+		Timestamp: time.Now(),
+		Arrival:   time.Now().Add(time.Second),
+	}
 
 	b1, err := json.Marshal(p)
 	assert.Nil(t, err)
