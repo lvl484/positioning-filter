@@ -46,3 +46,11 @@ func TestNewConsumerIncorrectHost(t *testing.T) {
 	assert.EqualError(t, err, "kafka: client has run out of available brokers to talk to (Is your cluster reachable?)")
 	assert.Nil(t, consumer)
 }
+
+func TestConsumerClose(t *testing.T) {
+	consumer := &Consumer{
+		closeChan: make(chan bool),
+	}
+	err := consumer.Close()
+	assert.Nil(t, err)
+}
