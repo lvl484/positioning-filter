@@ -14,8 +14,8 @@ const (
 	srcname = "Positioning filter"
 )
 
-// ErrFailedToConfigureLog is the error returned when configuring failed for some reasons
-var ErrFailedToConfigureLog = errors.New("Failed to init log: failed to configure ")
+// ErrBadLogDestination is the error returned when configuring failed becase of wrong destination
+var ErrBadLogDestination = errors.New("logger: bad destination for logger ")
 
 // NewLogger initialized logger according to configuration
 func NewLogger(lc *Config) error {
@@ -31,7 +31,7 @@ func NewLogger(lc *Config) error {
 	case "Graylog":
 		lc.setLoggerToGraylog()
 	default:
-		err = ErrFailedToConfigureLog
+		err = ErrBadLogDestination
 		return err
 	}
 	return nil
