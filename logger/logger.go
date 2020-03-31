@@ -2,7 +2,6 @@ package logger
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -52,8 +51,6 @@ func (lc *Config) setLoggerToStdout() {
 
 // setLoggerToGraylog initialize logger for writing to Graylog
 func (lc *Config) setLoggerToGraylog() {
-	var hook log.Hook
-	graylogAdr := fmt.Sprintf("%v:%v", lc.Host, lc.Port)
-	hook = graylog.NewGraylogHook(graylogAdr, map[string]interface{}{"API": "Positioning filter"})
+	hook := graylog.NewGraylogHook(lc.Host+":"+lc.Port, map[string]interface{}{"API": "Positioning filter"})
 	log.AddHook(hook)
 }
