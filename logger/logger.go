@@ -9,6 +9,11 @@ import (
 	graylog "gopkg.in/gemnasium/logrus-graylog-hook.v2"
 )
 
+const (
+	srctype = "API"
+	srcname = "Positioning filter"
+)
+
 // ErrFailedToConfigureLog is the error returned when configuring failed for some reasons
 var ErrFailedToConfigureLog = errors.New("Failed to init log: failed to configure ")
 
@@ -51,6 +56,6 @@ func (lc *Config) setLoggerToStdout() {
 
 // setLoggerToGraylog initialize logger for writing to Graylog
 func (lc *Config) setLoggerToGraylog() {
-	hook := graylog.NewGraylogHook(lc.Host+":"+lc.Port, map[string]interface{}{"API": "Positioning filter"})
+	hook := graylog.NewGraylogHook(lc.Host+":"+lc.Port, map[string]interface{}{srctype: srcname})
 	log.AddHook(hook)
 }
