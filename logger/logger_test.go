@@ -38,10 +38,10 @@ func TestNewLogger(t *testing.T) {
 		Port:   "15000",
 		Output: "Graynlog13",
 	}
-	conf_file := &Config{
+	confFile := &Config{
 		Output: "File",
 	}
-	conf_stdout := &Config{
+	confStdout := &Config{
 		Output: "Stdout",
 	}
 
@@ -56,14 +56,14 @@ func TestNewLogger(t *testing.T) {
 			wantErr: false,
 		}, {
 			name:    "CorrectConfig2",
-			lc:      conf_file,
+			lc:      confFile,
 			wantErr: false,
 		}, {
 			name:    "CorrectConfig3",
-			lc:      conf_stdout,
+			lc:      confStdout,
 			wantErr: false,
 		}, {
-			name:    "UncorrectConfig",
+			name:    "IncorrectConfig",
 			lc:      incorrectConf,
 			wantErr: true,
 		},
