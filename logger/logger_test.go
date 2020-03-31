@@ -91,16 +91,16 @@ func TestLogConfigsetLoggerToFile(t *testing.T) {
 
 func TestLogConfigsetLoggerToStdout(t *testing.T) {
 
-	conf_file := &Config{
+	confFile := &Config{
 		Output: "Filename",
 	}
-	conf_stdout := &Config{
+	confStdout := &Config{
 		Output: "Stdout",
 	}
 
-	conf_stdout.setLoggerToStdout()
+	confStdout.setLoggerToStdout()
 	assert.Equal(t, os.Stdout, log.StandardLogger().Out)
-	conf_file.setLoggerToStdout()
+	confFile.setLoggerToStdout()
 	assert.Equal(t, os.Stdout, log.StandardLogger().Out)
 
 }
