@@ -62,7 +62,7 @@ func TestMessageControllerHandleMessageSuccess(t *testing.T) {
 
 	saramaProducer.ExpectSendMessageWithCheckerFunctionAndSucceed(checker)
 
-	matcher.EXPECT().Match(pos)
+	matcher.EXPECT().Match(pos).Return(true, nil)
 
 	err = consumerGroupHandler.controller.handleMessage(pos)
 	assert.NoError(t, err)
