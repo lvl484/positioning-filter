@@ -2,6 +2,7 @@
 package kafka
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -50,7 +51,25 @@ func TestNewConsumerIncorrectHost(t *testing.T) {
 func TestConsumerClose(t *testing.T) {
 	consumer := &Consumer{
 		closeChan: make(chan bool),
+		once:      sync.Once{},
 	}
 	err := consumer.Close()
 	assert.NoError(t, err)
+
+	_, ok := <-consumer.closeChan
+	assert.False(t, ok)
+}
+
+func TestConsumerDoubleClose(t *testing.T) {
+	consumer := &Consumer{
+		closeChan: make(chan bool),
+		once:      sync.Once{},
+	}
+	err := consumer.Close()
+	assert.NoError(t, err)
+	err = consumer.Close()
+	assert.NoError(t, err)
+
+	_, ok := <-consumer.closeChan
+	assert.False(t, ok)
 }

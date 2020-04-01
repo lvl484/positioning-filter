@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/Shopify/sarama"
 	"github.com/lvl484/positioning-filter/matcher"
@@ -14,6 +15,7 @@ type Consumer struct {
 	ConsumerGroup sarama.ConsumerGroup
 	Config        *Config
 	closeChan     chan bool
+	once          sync.Once
 }
 
 func NewConsumer(config *Config) (*Consumer, error) {
@@ -40,6 +42,7 @@ func NewConsumer(config *Config) (*Consumer, error) {
 		ConsumerGroup: consumerGroup,
 		Config:        config,
 		closeChan:     closeChan,
+		once:          sync.Once{},
 	}, nil
 }
 
@@ -67,6 +70,7 @@ func (c *Consumer) Consume(matcher matcher.Matcher, producer Producer) {
 
 // Close closes Consume func. Returns nil error to implement io.Closer interface
 func (c *Consumer) Close() error {
-	close(c.closeChan)
+	c.once.Do(func() { close(c.closeChan) })
+
 	return nil
 }
