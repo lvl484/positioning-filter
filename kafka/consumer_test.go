@@ -16,9 +16,9 @@ func TestIntegrationNewConsumer(t *testing.T) {
 		ConsumerTopic:   "testTopic",
 		ConsumerGroupID: "1",
 	}
-	_, err := NewConsumer(config)
-
-	assert.Nil(t, err)
+	consumer, err := NewConsumer(config)
+	assert.NotNil(t, consumer)
+	assert.NoError(t, err)
 }
 
 func TestNewConsumerIncorrectVersion(t *testing.T) {
@@ -52,5 +52,5 @@ func TestConsumerClose(t *testing.T) {
 		closeChan: make(chan bool),
 	}
 	err := consumer.Close()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
