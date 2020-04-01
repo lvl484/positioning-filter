@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	loggerHost   = "logger.Host"
-	loggerPort   = "logger.Port"
-	loggerOutput = "logger.Output"
+	loggerHost     = "logger.Host"
+	loggerPort     = "logger.Port"
+	loggerOutput   = "logger.Output"
+	loggerFileName = "logger.FileName"
 )
 
 func TestNewLogger(t *testing.T) {
@@ -82,7 +83,7 @@ func TestNewLogger(t *testing.T) {
 
 func TestLogConfigsetLoggerToFile(t *testing.T) {
 
-	_, err := os.OpenFile("positioning_filter.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	_, err := os.OpenFile("positioning_filter_test.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 
 	if err != nil {
 		t.Errorf("Config.setLoggerToFile() error = %v", err)

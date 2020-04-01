@@ -15,7 +15,8 @@
     "logger": {
         "Host": "HOST3",
         "Port": "PORT3",
-        "Output":"OUTPUT3"
+        "Output":"OUTPUT3",
+        "FileName":"FILENAME3"
     },
     "kafka": {
         "Host": "HOST4",

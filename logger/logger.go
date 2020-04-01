@@ -39,7 +39,7 @@ func NewLogger(lc *Config) error {
 
 // setLoggerToFile initialize logger for writing to file
 func (lc *Config) setLoggerToFile() error {
-	f, err := os.OpenFile("positioning_filter.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	f, err := os.OpenFile(lc.FileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(f)
 	return err
