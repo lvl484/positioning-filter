@@ -47,7 +47,9 @@ func (lc *Config) setLoggerToFile() error {
 
 // setLoggerToStdout initialize logger for writing to stdout
 func (lc *Config) setLoggerToStdout() {
-	formatter := &logrus.TextFormatter{}
+	formatter := &logrus.TextFormatter{
+		FullTimestamp: true,
+	}
 	log.SetFormatter(formatter)
 	log.SetOutput(os.Stdout)
 }
