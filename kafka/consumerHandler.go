@@ -25,12 +25,16 @@ func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, cla
 	for msg := range claim.Messages() {
 		var p position.Position
 		if err := json.Unmarshal(msg.Value, &p); err != nil {
-			log.Println()
+			log.Println(err)
+			sess.MarkMessage(msg, "")
+
 			continue
 		}
 
 		if err := h.controller.handleMessage(p); err != nil {
 			log.Println(err)
+			sess.MarkMessage(msg, "")
+
 			continue
 		}
 
@@ -51,13 +55,11 @@ func (m *messageController) handleMessage(pos position.Position) error {
 		return err
 	}
 
-	if matched {
-		if err := m.producer.Produce(pos); err != nil {
-			return err
-		}
+	if !matched {
+		return nil
 	}
 
-	return nil
+	return m.producer.Produce(pos)
 }
 
 func newConsumerGroupHandler(matcher matcher.Matcher, producer Producer) *consumerGroupHandler {
