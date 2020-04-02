@@ -9,7 +9,7 @@ import (
 
 // Filter is a struct to manipulate users' filter objects in database
 type Filter struct {
-	Name          string
+	ID            uuid.UUID
 	Type          string
 	Configuration json.RawMessage
 	Reversed      bool
