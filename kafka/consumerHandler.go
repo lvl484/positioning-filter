@@ -24,21 +24,18 @@ func (consumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error { retur
 func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		var p position.Position
+
+		sess.MarkMessage(msg, "")
+
 		if err := json.Unmarshal(msg.Value, &p); err != nil {
 			log.Println(err)
-			sess.MarkMessage(msg, "")
-
 			continue
 		}
 
 		if err := h.controller.handleMessage(p); err != nil {
 			log.Println(err)
-			sess.MarkMessage(msg, "")
-
 			continue
 		}
-
-		sess.MarkMessage(msg, "")
 	}
 
 	return nil
