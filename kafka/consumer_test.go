@@ -58,8 +58,12 @@ func TestConsumerClose(t *testing.T) {
 	err := consumer.Close()
 	assert.NoError(t, err)
 
-	_, ok := <-consumer.closeChan
-	assert.False(t, ok)
+	select {
+	case _, ok := <-consumer.closeChan:
+		assert.False(t, ok)
+	default:
+		t.Error("Channel is not closed")
+	}
 }
 
 func TestConsumerDoubleClose(t *testing.T) {
@@ -72,8 +76,12 @@ func TestConsumerDoubleClose(t *testing.T) {
 	err = consumer.Close()
 	assert.NoError(t, err)
 
-	_, ok := <-consumer.closeChan
-	assert.False(t, ok)
+	select {
+	case _, ok := <-consumer.closeChan:
+		assert.False(t, ok)
+	default:
+		t.Error("Channel is not closed")
+	}
 }
 
 func TestGetKafkaAddr(t *testing.T) {
