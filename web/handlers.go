@@ -11,6 +11,11 @@ import (
 	"github.com/lvl484/positioning-filter/repository"
 )
 
+const (
+	userID   = "user_id"
+	filterID = "id"
+)
+
 type WebFilters struct {
 	filters repository.Filters
 }
@@ -31,25 +36,29 @@ func (wb *WebFilters) AddFilter(rw http.ResponseWriter, r *http.Request) {
 
 	if err := wb.filters.Add(&filter); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 }
 
 func (wb *WebFilters) GetFiltersByUser(rw http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
-	userIDstring := m["USERID"]
+	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	filters, err := wb.filters.AllByUser(userID)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	if err := json.NewEncoder(rw).Encode(filters); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -62,8 +71,8 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	m := mux.Vars(r)
-	filterName := m["FILTERNAME"]
-	userIDstring := m["USERID"]
+	filterName := m[filterID]
+	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
@@ -80,20 +89,28 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 
 func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
-	filterName := m["FILTERNAME"]
-	n := mux.Vars(r)
-	userIDstring := n["USERID"]
+	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-	filters := wb.filters.Delete(userID, filterName) //!!!???
+	filterIDstring := m[filterID]
+	filterID, err := uuid.Parse(filterIDstring)
+	if err != nil {
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	filters := wb.filters.Delete(userID, filterID)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	if err := json.NewEncoder(rw).Encode(filters); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
