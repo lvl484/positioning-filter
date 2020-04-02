@@ -19,7 +19,7 @@ type Consumer struct {
 }
 
 func NewConsumer(config *Config) (*Consumer, error) {
-	addr := newBrokerAddr(config)
+	addr := getKafkaAddr(config)
 	version, err := sarama.ParseKafkaVersion(config.Version)
 
 	if err != nil {

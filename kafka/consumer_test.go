@@ -75,3 +75,13 @@ func TestConsumerDoubleClose(t *testing.T) {
 	_, ok := <-consumer.closeChan
 	assert.False(t, ok)
 }
+
+func TestGetKafkaAddr(t *testing.T) {
+	config := &Config{
+		Host: "localhost",
+		Port: "80",
+	}
+	expectedAddr := []string{"localhost:80"}
+	addr := getKafkaAddr(config)
+	assert.Equal(t, expectedAddr, addr)
+}
