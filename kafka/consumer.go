@@ -71,6 +71,5 @@ func (c *Consumer) Consume(matcher matcher.Matcher, producer Producer) {
 // Close closes Consume func. Returns nil error to implement io.Closer interface
 func (c *Consumer) Close() error {
 	c.once.Do(func() { close(c.closeChan) })
-
 	return nil
 }
