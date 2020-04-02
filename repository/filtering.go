@@ -10,14 +10,14 @@ import (
 const (
 	addQuery    = "INSERT INTO FILTERS(name,type,configutation,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
 	getQuery    = "SELECT * FROM FILTERS WHERE user_id=$1"
-	updateQuery = "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE name = $4"
+	updateQuery = "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE user_id=$4 AND name = $5"
 	deleteQuery = "DELETE FROM FILTERS WHERE user_id=$1 AND name=$2"
 )
 
 type Filters interface {
 	AllByUser(userID uuid.UUID) ([]*Filter, error)
 	Add(filter *Filter) error
-	Update(filter *Filter) error
+	Update(userID uuid.UUID, name string, filter *Filter) error
 	Delete(userID uuid.UUID, name string) error
 }
 
@@ -66,8 +66,8 @@ func (p *filtersRepo) AllByUser(userID uuid.UUID) ([]*Filter, error) {
 }
 
 // Update updates filter fields by filter name
-func (p *filtersRepo) Update(filter *Filter) error {
-	_, err := p.db.Exec(updateQuery, filter.Type, filter.Configuration, filter.Reversed, filter.Name)
+func (p *filtersRepo) Update(userID uuid.UUID, filterName string, filter *Filter) error {
+	_, err := p.db.Exec(updateQuery, filter.Type, filter.Configuration, filter.Reversed, userID, filter.Name)
 	return err
 }
 
