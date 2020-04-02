@@ -19,7 +19,7 @@ type Consumer struct {
 }
 
 func NewConsumer(config *Config) (*Consumer, error) {
-	addr := []string{fmt.Sprintf("%v:%v", config.Host, config.Port)}
+	addr := newBrokerAddr(config)
 	version, err := sarama.ParseKafkaVersion(config.Version)
 
 	if err != nil {
@@ -72,4 +72,8 @@ func (c *Consumer) Consume(matcher matcher.Matcher, producer Producer) {
 func (c *Consumer) Close() error {
 	c.once.Do(func() { close(c.closeChan) })
 	return nil
+}
+
+func getKafkaAddr(c *Config) []string {
+	return []string{fmt.Sprintf("%v:%v", c.Host, c.Port)}
 }
