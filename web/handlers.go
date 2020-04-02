@@ -58,25 +58,24 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	m := mux.Vars(r)
 	filterName := m["FILTERNAME"]
-	n := mux.Vars(r)
-	userIDstring := n["USERID"]
+	userIDstring := m["USERID"]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-	filters, err := wb.filters.Update(userID, filterName, &filter) //!!!???
-	if err != nil {
+	if err := wb.filters.Update(userID, filterName, &filter); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	if err := json.NewEncoder(rw).Encode(filters); err != nil {
-		rw.WriteHeader(http.StatusInternalServerError)
-	}
+	rw.WriteHeader(http.StatusNoContent) //swagger
 }
 
 func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
@@ -89,7 +88,7 @@ func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusNotFound)
 	}
 
-	filters, err := wb.filters.Delete(userID, filterName) //!!!???
+	filters := wb.filters.Delete(userID, filterName) //!!!???
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 	}
