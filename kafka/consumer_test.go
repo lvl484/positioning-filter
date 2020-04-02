@@ -19,6 +19,7 @@ func TestIntegrationNewConsumer(t *testing.T) {
 	}
 	consumer, err := NewConsumer(config)
 	assert.NotNil(t, consumer)
+	assert.NotNil(t, consumer.closeChan)
 	assert.NoError(t, err)
 }
 
