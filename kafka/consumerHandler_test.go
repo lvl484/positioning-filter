@@ -2,12 +2,10 @@
 package kafka
 
 import (
-	"encoding/json"
 	"errors"
 	"testing"
 	"time"
 
-	saramaMocks "github.com/Shopify/sarama/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -30,81 +28,83 @@ func TestNewConsumerGroupHandler(t *testing.T) {
 }
 
 func TestMessageControllerHandleMessageSuccess(t *testing.T) {
-	matcherCtrl := gomock.NewController(t)
+	producerCtrl, producer, matcherCtrl, matcher, consumerGroupHandler := testConsumerGroupHandlerInit(t)
+	defer producerCtrl.Finish()
 	defer matcherCtrl.Finish()
-	matcher := mockMatcher.NewMockMatcher(matcherCtrl)
 
-	saramaProducer := saramaMocks.NewSyncProducer(t, nil)
-	producer := &producer{
-		KafkaProducer: saramaProducer,
-		Config: &Config{
-			ProducerTopic: "filtered-positions",
-		},
-	}
+	pos := newPosition()
 
-	consumerGroupHandler := newConsumerGroupHandler(matcher, producer)
+	matcher.EXPECT().Match(pos).Return(true, nil)
+	producer.EXPECT().Produce(pos).Return(nil)
 
-	pos := position.Position{
+	err := consumerGroupHandler.controller.handleMessage(pos)
+	assert.NoError(t, err)
+}
+
+func TestMessageControllerHandleMessageFailMatcher(t *testing.T) {
+	producerCtrl, _, matcherCtrl, matcher, consumerGroupHandler := testConsumerGroupHandlerInit(t)
+	defer producerCtrl.Finish()
+	defer matcherCtrl.Finish()
+
+	pos := newPosition()
+
+	matcherError := errors.New("matcher doesn't want to match, matcher want to play minecraft")
+
+	matcher.EXPECT().Match(pos).Return(false, matcherError)
+
+	err := consumerGroupHandler.controller.handleMessage(pos)
+	assert.EqualError(t, err, "matcher doesn't want to match, matcher want to play minecraft")
+}
+
+func TestMessageControllerHandleMessageNotMatched(t *testing.T) {
+	producerCtrl, _, matcherCtrl, matcher, consumerGroupHandler := testConsumerGroupHandlerInit(t)
+	defer producerCtrl.Finish()
+	defer matcherCtrl.Finish()
+
+	pos := newPosition()
+
+	matcher.EXPECT().Match(pos).Return(false, nil)
+
+	err := consumerGroupHandler.controller.handleMessage(pos)
+	assert.NoError(t, err)
+}
+
+func TestMessageControllerHandleMessageFailProducer(t *testing.T) {
+	producerCtrl, producer, matcherCtrl, matcher, consumerGroupHandler := testConsumerGroupHandlerInit(t)
+	defer producerCtrl.Finish()
+	defer matcherCtrl.Finish()
+
+	pos := newPosition()
+
+	producerError := errors.New("produce message was failed because producer falled asleep")
+
+	matcher.EXPECT().Match(pos).Return(true, nil)
+	producer.EXPECT().Produce(pos).Return(producerError)
+
+	err := consumerGroupHandler.controller.handleMessage(pos)
+	assert.EqualError(t, err, "produce message was failed because producer falled asleep")
+}
+
+func newPosition() position.Position {
+	return position.Position{
 		UserID:    uuid.New(),
 		Latitude:  float32(1.111),
 		Longitude: float32(2.222),
 		Timestamp: time.Now(),
 		Arrival:   time.Now().Add(time.Second),
 	}
-
-	b1, err := json.Marshal(pos)
-	assert.NoError(t, err)
-
-	checker := func(b2 []byte) error {
-		assert.Equal(t, b1, b2)
-		return nil
-	}
-
-	saramaProducer.ExpectSendMessageWithCheckerFunctionAndSucceed(checker)
-
-	matcher.EXPECT().Match(pos).Return(true, nil)
-
-	err = consumerGroupHandler.controller.handleMessage(pos)
-	assert.NoError(t, err)
 }
 
-func TestMessageControllerHandleMessageFail(t *testing.T) {
+func testConsumerGroupHandlerInit(t *testing.T) (
+	*gomock.Controller, *mockKafka.MockProducer, *gomock.Controller, *mockMatcher.MockMatcher, *consumerGroupHandler,
+) {
 	matcherCtrl := gomock.NewController(t)
-	defer matcherCtrl.Finish()
 	matcher := mockMatcher.NewMockMatcher(matcherCtrl)
 
-	saramaProducer := saramaMocks.NewSyncProducer(t, nil)
-	producer := &producer{
-		KafkaProducer: saramaProducer,
-		Config: &Config{
-			ProducerTopic: "filtered-positions",
-		},
-	}
+	producerCtrl := gomock.NewController(t)
+	producer := mockKafka.NewMockProducer(producerCtrl)
 
 	consumerGroupHandler := newConsumerGroupHandler(matcher, producer)
 
-	pos := position.Position{
-		UserID:    uuid.New(),
-		Latitude:  float32(1.666),
-		Longitude: float32(1.333),
-		Timestamp: time.Now(),
-		Arrival:   time.Now().Add(time.Second),
-	}
-
-	b1, err := json.Marshal(pos)
-	assert.NoError(t, err)
-
-	checker := func(b2 []byte) error {
-		assert.Equal(t, b1, b2)
-		return nil
-	}
-
-	producerError := errors.New("produce message was failed because producer falled asleep")
-
-	saramaProducer.ExpectSendMessageWithCheckerFunctionAndFail(checker, producerError)
-
-	matcher.EXPECT().Match(pos).Return(true, nil)
-
-	err = consumerGroupHandler.controller.handleMessage(pos)
-	assert.EqualError(t, err, "produce message was failed because producer falled asleep")
+	return producerCtrl, producer, matcherCtrl, matcher, consumerGroupHandler
 }
