@@ -4,9 +4,14 @@ package matcher
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/lvl484/positioning-filter/position"
 	"github.com/lvl484/positioning-filter/repository"
+)
+
+const (
+	ErrBadFilterType = "Bad type of filter"
 )
 
 type matcher func(position.Position, *repository.Filter) (bool, error)
@@ -22,7 +27,10 @@ func (m matcherFilters) Match(pos position.Position) (bool, error) {
 	}
 
 	for _, filter := range filters {
-		match := matcherByType(filter.Type)
+		match, err := matcherByType(filter.Type)
+		if err != nil {
+			return false, err
+		}
 		matched, err := match(pos, filter)
 
 		if err != nil {
@@ -41,14 +49,14 @@ func NewMatcher(filters repository.Filters) Matcher {
 	return matcherFilters{filters: filters}
 }
 
-func matcherByType(matcherType string) matcher {
+func matcherByType(matcherType string) (matcher, error) {
 	switch matcherType {
 	case "round":
-		return matchRound
+		return matchRound, nil
 	case "rectangular":
-		return matchRectangular
+		return matchRectangular, nil
 	default:
-		return nil
+		return nil, errors.New(ErrBadFilterType)
 	}
 }
 

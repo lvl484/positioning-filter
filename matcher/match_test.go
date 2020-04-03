@@ -4,19 +4,21 @@ package matcher
 
 import (
 	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/lvl484/positioning-filter/position"
 	"github.com/lvl484/positioning-filter/repository"
+	mockRepository "github.com/lvl484/positioning-filter/repository/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMatchRoundMatched(t *testing.T) {
 	filter := newTestRoundFilter(0, 0, 50, false)
 	position := newTestPosition(30, 40)
-
 	matched, err := matchRound(position, filter)
 	assert.NoError(t, err)
 	assert.True(t, matched)
@@ -25,7 +27,6 @@ func TestMatchRoundMatched(t *testing.T) {
 func TestMatchRoundNotMatched(t *testing.T) {
 	filter := newTestRoundFilter(1, 1, 50, false)
 	position := newTestPosition(-31.001, 41)
-
 	matched, err := matchRound(position, filter)
 	assert.NoError(t, err)
 	assert.False(t, matched)
@@ -34,7 +35,6 @@ func TestMatchRoundNotMatched(t *testing.T) {
 func TestMatchRoundMatchedReversed(t *testing.T) {
 	filter := newTestRoundFilter(0, 0, 50, true)
 	position := newTestPosition(-30.001, 40)
-
 	matched, err := matchRound(position, filter)
 	assert.NoError(t, err)
 	assert.True(t, matched)
@@ -43,7 +43,6 @@ func TestMatchRoundMatchedReversed(t *testing.T) {
 func TestMatchRoundNotMatchedReversed(t *testing.T) {
 	filter := newTestRoundFilter(0, 0, 130, true)
 	position := newTestPosition(-50, 120)
-
 	matched, err := matchRound(position, filter)
 	assert.NoError(t, err)
 	assert.False(t, matched)
@@ -108,18 +107,115 @@ func TestMatchRectangularFail(t *testing.T) {
 }
 
 func TestMatcherByTypeRound(t *testing.T) {
-	matcher := matcherByType("round")
+	matcher, err := matcherByType("round")
+	assert.NoError(t, err)
 	assert.NotNil(t, matcher)
 }
 
 func TestMatcherByTypeRectangular(t *testing.T) {
-	matcher := matcherByType("rectangular")
+	matcher, err := matcherByType("rectangular")
+	assert.NoError(t, err)
 	assert.NotNil(t, matcher)
 }
 
 func TestMatcherByTypeFail(t *testing.T) {
-	matcher := matcherByType("type")
+	matcher, err := matcherByType("type")
+	assert.EqualError(t, err, ErrBadFilterType)
 	assert.Nil(t, matcher)
+}
+
+func TestMatcherMatchMatched(t *testing.T) {
+	ctrl, filters := newTestFilterMock(t)
+	defer ctrl.Finish()
+
+	position := newTestPosition(14, 15)
+	matcher := matcherFilters{filters: filters}
+
+	filter1 := newTestRoundFilter(0, 0, 1, false)
+	filter2 := newTestRoundFilter(0, 0, 100, false)
+	filterSlice := []*repository.Filter{filter1, filter2}
+
+	filters.EXPECT().AllByUser(position.UserID).Return(filterSlice, nil)
+	matched, err := matcher.Match(position)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+
+func TestMatcherMatchNotMatched(t *testing.T) {
+	ctrl, filters := newTestFilterMock(t)
+	defer ctrl.Finish()
+
+	position := newTestPosition(10, 15)
+	matcher := matcherFilters{filters: filters}
+
+	filter1 := newTestRoundFilter(0, 0, 1, false)
+	filter2 := newTestRoundFilter(0, 0, 100, true)
+	filterSlice := []*repository.Filter{filter1, filter2}
+
+	filters.EXPECT().AllByUser(position.UserID).Return(filterSlice, nil)
+	matched, err := matcher.Match(position)
+	assert.NoError(t, err)
+	assert.False(t, matched)
+}
+
+func TestMatcherMatchFailAllByUser(t *testing.T) {
+	ctrl, filters := newTestFilterMock(t)
+	defer ctrl.Finish()
+
+	position := newTestPosition(10, 15)
+	matcher := matcherFilters{filters: filters}
+	testError := errors.New("AllByUser failed because user died")
+
+	filters.EXPECT().AllByUser(position.UserID).Return(nil, testError)
+	matched, err := matcher.Match(position)
+	assert.EqualError(t, err, "AllByUser failed because user died")
+	assert.False(t, matched)
+}
+
+func TestMatcherMatchFailMatcherByType(t *testing.T) {
+	ctrl, filters := newTestFilterMock(t)
+	defer ctrl.Finish()
+
+	position := newTestPosition(10, 15)
+	matcher := matcherFilters{filters: filters}
+
+	filter := newTestRoundFilter(0, 0, 100, true)
+	filter.Type = "SomeType"
+	filterSlice := []*repository.Filter{filter}
+
+	filters.EXPECT().AllByUser(position.UserID).Return(filterSlice, nil)
+	matched, err := matcher.Match(position)
+	assert.EqualError(t, err, ErrBadFilterType)
+	assert.False(t, matched)
+}
+
+func TestMatcherMatchFailMatch(t *testing.T) {
+	ctrl, filters := newTestFilterMock(t)
+	defer ctrl.Finish()
+
+	position := newTestPosition(0, 0)
+	matcher := matcherFilters{filters}
+
+	filter := &repository.Filter{
+		Name:          "Filter",
+		Type:          "round",
+		Configuration: []byte{15, 13, 26, 77},
+		Reversed:      true,
+	}
+	filterSlice := []*repository.Filter{filter}
+
+	filters.EXPECT().AllByUser(position.UserID).Return(filterSlice, nil)
+	matched, err := matcher.Match(position)
+	assert.NotNil(t, err)
+	assert.False(t, matched)
+}
+
+func TestNewMatcher(t *testing.T) {
+	ctrl, filters := newTestFilterMock(t)
+	defer ctrl.Finish()
+
+	matcher := NewMatcher(filters)
+	assert.NotNil(t, matcher)
 }
 
 func newTestRoundFilter(centerLatitude, centerLongitude, radius float32, reversed bool) *repository.Filter {
@@ -132,7 +228,7 @@ func newTestRoundFilter(centerLatitude, centerLongitude, radius float32, reverse
 
 	return &repository.Filter{
 		Name:          "RoundFilter",
-		Type:          "Round",
+		Type:          "round",
 		Configuration: b,
 		Reversed:      reversed,
 		UserID:        uuid.New(),
@@ -152,7 +248,7 @@ func newTestRectangularFilter(
 
 	return &repository.Filter{
 		Name:          "RectangularFilter",
-		Type:          "Rectangular",
+		Type:          "rectangular",
 		Configuration: b,
 		Reversed:      reversed,
 		UserID:        uuid.New(),
@@ -167,4 +263,11 @@ func newTestPosition(latitude, longitude float32) position.Position {
 		Timestamp: time.Now(),
 		Arrival:   time.Now().Add(time.Millisecond),
 	}
+}
+
+func newTestFilterMock(t *testing.T) (*gomock.Controller, *mockRepository.MockFilters) {
+	ctrl := gomock.NewController(t)
+	filters := mockRepository.NewMockFilters(ctrl)
+
+	return ctrl, filters
 }
