@@ -9,14 +9,16 @@ import (
 
 const (
 	addQuery    = "INSERT INTO FILTERS(name,type,configutation,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
-	getQuery    = "SELECT * FROM FILTERS WHERE user_id=$1"
-	updateQuery = "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE name = $4"
+	getOneQuery = "SELECT * FROM FILTERS WHERE user_id=$1 AND name=$2"
+	getAllQuery = "SELECT * FROM FILTERS WHERE user_id=$1"
+	updateQuery = "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE user_id=$4 AND name=$5"
 	deleteQuery = "DELETE FROM FILTERS WHERE user_id=$1 AND name=$2"
 )
 
 type Filters interface {
-	AllByUser(userID uuid.UUID) ([]*Filter, error)
 	Add(filter *Filter) error
+	OneByUser(userID uuid.UUID, name string) (*Filter, error)
+	AllByUser(userID uuid.UUID) ([]*Filter, error)
 	Update(filter *Filter) error
 	Delete(userID uuid.UUID, name string) error
 }
@@ -37,11 +39,25 @@ func (p *filtersRepo) Add(filter *Filter) error {
 	return err
 }
 
+// OneByUser returns filter for relevant user
+func (p *filtersRepo) OneByUser(userID uuid.UUID, name string) (*Filter, error) {
+	var filter *Filter
+
+	row := p.db.QueryRow(getOneQuery, userID, name)
+
+	err := row.Scan(filter.Name, filter.Type, filter.Configuration, filter.Reversed, filter.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return filter, nil
+}
+
 // AllByUser returns set of filters for relevant user
 func (p *filtersRepo) AllByUser(userID uuid.UUID) ([]*Filter, error) {
 	filters := []*Filter{}
 
-	rows, err := p.db.Query(getQuery, userID)
+	rows, err := p.db.Query(getAllQuery, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +81,14 @@ func (p *filtersRepo) AllByUser(userID uuid.UUID) ([]*Filter, error) {
 	return filters, nil
 }
 
-// Update updates filter fields by filter name
+// Update updates filter fields by filter id for relevant user
 func (p *filtersRepo) Update(filter *Filter) error {
-	_, err := p.db.Exec(updateQuery, filter.Type, filter.Configuration, filter.Reversed, filter.Name)
+	_, err := p.db.Exec(updateQuery, filter.Type, filter.Configuration, filter.Reversed, filter.UserID, filter.Name)
 	return err
 }
 
-// Delete deletes filter by name for relevant user
-func (p *filtersRepo) Delete(userID uuid.UUID, filterName string) error {
-	_, err := p.db.Exec(deleteQuery, userID, filterName)
+// Delete deletes filter by id for relevant user
+func (p *filtersRepo) Delete(userID uuid.UUID, name string) error {
+	_, err := p.db.Exec(deleteQuery, userID, name)
 	return err
 }
