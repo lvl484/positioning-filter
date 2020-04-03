@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	userID   = "user_id"
-	filterID = "id"
+	userID = "user_id"
+	name   = "name"
 )
 
 type WebFilters struct {
@@ -41,7 +41,7 @@ func (wb *WebFilters) AddFilter(rw http.ResponseWriter, r *http.Request) {
 
 }
 
-func (wb *WebFilters) GetFiltersByUser(rw http.ResponseWriter, r *http.Request) {
+func (wb *WebFilters) GetAllFiltersByUser(rw http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
@@ -62,6 +62,21 @@ func (wb *WebFilters) GetFiltersByUser(rw http.ResponseWriter, r *http.Request) 
 	}
 }
 
+func (wb *WebFilters) GetOneFilterByUser(rw http.ResponseWriter, r *http.Request) {
+	m := mux.Vars(r)
+	filterName := m[name]
+	userIDstring := m[userID]
+	userID, err := uuid.Parse(userIDstring)
+	if err != nil {
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if err := wb.filters.OneByUser(userID, filterName); err != nil {
+		return
+	}
+}
+
 func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 	var filter repository.Filter
 
@@ -71,7 +86,7 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	m := mux.Vars(r)
-	filterName := m[filterID]
+	filterName := m[name]
 	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
@@ -84,7 +99,7 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusNoContent) //swagger
+	rw.WriteHeader(http.StatusNoContent)
 }
 
 func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
@@ -96,14 +111,9 @@ func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filterIDstring := m[filterID]
-	filterID, err := uuid.Parse(filterIDstring)
-	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
-		return
-	}
+	filterName := m[name]
 
-	filters := wb.filters.Delete(userID, filterID)
+	filters := wb.filters.Delete(userID, filterName)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return

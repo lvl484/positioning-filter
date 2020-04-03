@@ -13,13 +13,13 @@ func NewRouter(filters repository.Filters) *mux.Router {
 	handle := NewWebFilters(filters)
 
 	router := mux.NewRouter()
-	router.Use(Middleware)
 
 	filtersRouter := router.PathPrefix("/router/{user_id}/filters").Subrouter()
 
 	filtersRouter.HandleFunc("/", handle.AddFilter).Methods(http.MethodPost)
-	filtersRouter.HandleFunc("/", handle.GetFiltersByUser).Methods(http.MethodGet)
-	filtersRouter.HandleFunc("/{id}", handle.UpdateFilter).Methods(http.MethodPut)
-	filtersRouter.HandleFunc("/{id}", handle.DeleteFilter).Methods(http.MethodDelete)
+	filtersRouter.HandleFunc("/", handle.GetAllFiltersByUser).Methods(http.MethodGet)
+	filtersRouter.HandleFunc("/{name}", handle.GetOneFilterByUser).Methods(http.MethodGet)
+	filtersRouter.HandleFunc("/{name}", handle.UpdateFilter).Methods(http.MethodPut)
+	filtersRouter.HandleFunc("/{name}", handle.DeleteFilter).Methods(http.MethodDelete)
 	return router
 }
