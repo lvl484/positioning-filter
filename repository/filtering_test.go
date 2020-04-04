@@ -13,118 +13,55 @@ import (
 
 func TestAdd(t *testing.T) {
 	db := newTestDB(t)
-	tx, err := db.Begin()
+	repo := NewFiltersRepository(db)
+	filter1 := newTestFilter("Name1", "round")
+	filter2 := newTestFilter("Name2", "round")
+	filter3 := newTestFilter("Name2", "round")
+	err := repo.Add(filter1)
 	assert.NoError(t, err)
-
-	filter := addTestFilterToDB(tx, t)
-	assert.NotNil(t, filter)
-
-	defer func(*testing.T) {
-		err := tx.Rollback()
-		assert.NoError(t, err)
-	}(t)
+	err = repo.Add(filter2)
+	assert.NoError(t, err)
+	err = repo.Add(filter3)
+	assert.NotNil(t, err)
 }
 
 func TestOneByUser(t *testing.T) {
 	db := newTestDB(t)
-	tx, err := db.Begin()
+	repo := NewFiltersRepository(db)
+	userID, err := uuid.Parse("d5cadefb-4d4d-4105-8244-1c354f936e69")
 	assert.NoError(t, err)
-
-	filter := addTestFilterToDB(tx, t)
-
-	row := tx.QueryRow(getOneQuery, filter.UserID, filter.Name)
-
-	var filterFromDB Filter
-	err = row.Scan(
-		&filterFromDB.Name,
-		&filterFromDB.Type,
-		&filterFromDB.Configuration,
-		&filterFromDB.Reversed,
-		&filterFromDB.UserID,
-	)
+	filter, err := repo.OneByUser(userID, "Name2")
 	assert.NoError(t, err)
-	assert.Equal(t, *filter, filterFromDB)
-
-	defer func(*testing.T) {
-		err := tx.Rollback()
-		assert.NoError(t, err)
-	}(t)
+	assert.NotNil(t, filter)
 }
 
 func TestAllByUser(t *testing.T) {
 	db := newTestDB(t)
-	tx, err := db.Begin()
+	repo := NewFiltersRepository(db)
+	userID, err := uuid.Parse("d5cadefb-4d4d-4105-8244-1c354f936e69")
 	assert.NoError(t, err)
-
-	filter := addTestFilterToDB(tx, t)
-
-	rows, err := tx.Query(getOneQuery, filter.UserID, filter.Name)
+	gotFilters, err := repo.AllByUser(userID)
 	assert.NoError(t, err)
-
-	var filtersFromDB []Filter
-
-	for rows.Next() {
-		var filterFromDB Filter
-		err = rows.Scan(
-			&filterFromDB.Name,
-			&filterFromDB.Type,
-			&filterFromDB.Configuration,
-			&filterFromDB.Reversed,
-			&filterFromDB.UserID,
-		)
-		assert.NoError(t, err)
-
-		filtersFromDB = append(filtersFromDB, filterFromDB)
-
-		err = rows.Err()
-		assert.NoError(t, err)
-	}
-
-	assert.NotNil(t, filtersFromDB)
-
-	defer func(*testing.T) {
-		err := tx.Rollback()
-		assert.NoError(t, err)
-	}(t)
+	assert.NotEmpty(t, gotFilters)
 }
 
 func TestUpdate(t *testing.T) {
 	db := newTestDB(t)
-	tx, err := db.Begin()
+	repo := NewFiltersRepository(db)
+	filter := newTestFilter("Name1", "rectangular")
+	err := repo.Update(filter)
 	assert.NoError(t, err)
-
-	filter := addTestFilterToDB(tx, t)
-
-	confUpdate, err := json.Marshal("someOtherString")
-	assert.NoError(t, err)
-
-	filter.Type = "rectangular"
-	filter.Configuration = confUpdate
-	filter.Reversed = true
-
-	_, err = tx.Exec(updateQuery, filter.Type, filter.Configuration, filter.Reversed, filter.UserID, filter.Name)
-	assert.NoError(t, err)
-
-	defer func(*testing.T) {
-		err := tx.Rollback()
-		assert.NoError(t, err)
-	}(t)
 }
 
 func TestDelete(t *testing.T) {
 	db := newTestDB(t)
-	tx, err := db.Begin()
+	repo := NewFiltersRepository(db)
+	userID, err := uuid.Parse("d5cadefb-4d4d-4105-8244-1c354f936e69")
 	assert.NoError(t, err)
-
-	filter := addTestFilterToDB(tx, t)
-
-	_, err = tx.Exec(deleteQuery, filter.UserID, filter.Name)
+	err = repo.Delete(userID, "Name1")
 	assert.NoError(t, err)
-
-	defer func(*testing.T) {
-		err := tx.Rollback()
-		assert.NoError(t, err)
-	}(t)
+	err = repo.Delete(userID, "Name2")
+	assert.NoError(t, err)
 }
 
 func newTestDB(t *testing.T) *sql.DB {
@@ -139,20 +76,15 @@ func newTestDB(t *testing.T) *sql.DB {
 	return db
 }
 
-func addTestFilterToDB(tx *sql.Tx, t *testing.T) *Filter {
-	conf, err := json.Marshal("someString")
-	assert.NoError(t, err)
+func newTestFilter(filterName, filterType string) *Filter {
+	conf, _ := json.Marshal("someString")
+	userID, _ := uuid.Parse("d5cadefb-4d4d-4105-8244-1c354f936e69")
 
-	filter := Filter{
-		Name:          "Filter",
-		Type:          "round",
+	return &Filter{
+		Name:          filterName,
+		Type:          filterType,
 		Configuration: conf,
 		Reversed:      false,
-		UserID:        uuid.New(),
+		UserID:        userID,
 	}
-
-	_, err = tx.Exec(addQuery, filter.Name, filter.Type, filter.Configuration, filter.Reversed, filter.UserID)
-	assert.NoError(t, err)
-
-	return &filter
 }
