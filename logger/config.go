@@ -2,6 +2,8 @@ package logger
 
 // Config for graylog
 type Config struct {
-	Host string
-	Port string
+	Host     string
+	Port     string
+	Output   string
+	FileName string
 }
