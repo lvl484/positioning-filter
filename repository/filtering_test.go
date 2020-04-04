@@ -31,8 +31,10 @@ func TestOneByUser(t *testing.T) {
 	userID, err := uuid.Parse("d5cadefb-4d4d-4105-8244-1c354f936e69")
 	assert.NoError(t, err)
 	filter, err := repo.OneByUser(userID, "Name2")
+	expectedFilter := newTestFilter("Name2", "round")
+
 	assert.NoError(t, err)
-	assert.NotNil(t, filter)
+	assert.Equal(t, *expectedFilter, *filter)
 }
 
 func TestAllByUser(t *testing.T) {
@@ -41,8 +43,12 @@ func TestAllByUser(t *testing.T) {
 	userID, err := uuid.Parse("d5cadefb-4d4d-4105-8244-1c354f936e69")
 	assert.NoError(t, err)
 	gotFilters, err := repo.AllByUser(userID)
+	filter1 := newTestFilter("Name1", "round")
+	filter2 := newTestFilter("Name2", "round")
+	wantFilters := []*Filter{filter1, filter2}
+
 	assert.NoError(t, err)
-	assert.NotEmpty(t, gotFilters)
+	assert.Equal(t, wantFilters, gotFilters)
 }
 
 func TestUpdate(t *testing.T) {
