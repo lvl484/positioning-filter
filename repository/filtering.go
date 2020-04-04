@@ -9,8 +9,8 @@ import (
 
 const (
 	addQuery    = "INSERT INTO FILTERS(name,type,configutation,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
-	getOneQuery = "SELECT * FROM FILTERS WHERE user_id=$1 AND name=$2"
-	getAllQuery = "SELECT * FROM FILTERS WHERE user_id=$1"
+	getOneQuery = "SELECT name, type, configuration, reversed, user_id FROM FILTERS WHERE user_id=$1 AND name=$2"
+	getAllQuery = "SELECT name, type, configuration, reversed, user_id  FROM FILTERS WHERE user_id=$1"
 	updateQuery = "UPDATE FILTERS SET (type,configutation,reversed) = ($1,$2,$3) WHERE user_id=$4 AND name=$5"
 	deleteQuery = "DELETE FROM FILTERS WHERE user_id=$1 AND name=$2"
 )
@@ -41,7 +41,7 @@ func (p *filtersRepo) Add(filter *Filter) error {
 
 // OneByUser returns filter for relevant user
 func (p *filtersRepo) OneByUser(userID uuid.UUID, filterName string) (*Filter, error) {
-	var filter *Filter
+	filter := new(Filter)
 
 	row := p.db.QueryRow(getOneQuery, userID, filterName)
 
