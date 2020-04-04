@@ -17,10 +17,10 @@ const (
 
 type Filters interface {
 	Add(filter *Filter) error
-	OneByUser(userID uuid.UUID, name string) (*Filter, error)
+	OneByUser(userID uuid.UUID, filterName string) (*Filter, error)
 	AllByUser(userID uuid.UUID) ([]*Filter, error)
 	Update(filter *Filter) error
-	Delete(userID uuid.UUID, name string) error
+	Delete(userID uuid.UUID, filterName string) error
 }
 
 type filtersRepo struct {
@@ -40,12 +40,12 @@ func (p *filtersRepo) Add(filter *Filter) error {
 }
 
 // OneByUser returns filter for relevant user
-func (p *filtersRepo) OneByUser(userID uuid.UUID, name string) (*Filter, error) {
+func (p *filtersRepo) OneByUser(userID uuid.UUID, filterName string) (*Filter, error) {
 	var filter *Filter
 
-	row := p.db.QueryRow(getOneQuery, userID, name)
+	row := p.db.QueryRow(getOneQuery, userID, filterName)
 
-	err := row.Scan(filter.Name, filter.Type, filter.Configuration, filter.Reversed, filter.UserID)
+	err := row.Scan(&filter.Name, &filter.Type, &filter.Configuration, &filter.Reversed, &filter.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (p *filtersRepo) Update(filter *Filter) error {
 }
 
 // Delete deletes filter by id for relevant user
-func (p *filtersRepo) Delete(userID uuid.UUID, name string) error {
-	_, err := p.db.Exec(deleteQuery, userID, name)
+func (p *filtersRepo) Delete(userID uuid.UUID, filterName string) error {
+	_, err := p.db.Exec(deleteQuery, userID, filterName)
 	return err
 }
