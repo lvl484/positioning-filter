@@ -50,6 +50,7 @@ func (m matcherFilters) Match(pos position.Position) (bool, error) {
 	return false, nil
 }
 
+// NewMatcher returns struct that implement Matcher interface
 func NewMatcher(filters repository.Filters) Matcher {
 	return matcherFilters{filters: filters}
 }
