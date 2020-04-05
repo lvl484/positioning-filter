@@ -70,8 +70,7 @@ func matchRectangular(pos position.Position, filter *repository.Filter) (bool, e
 		return false, err
 	}
 
-	conflict := checkReсtangularConflict(rfilter.TopLeftLatitude, rfilter.BottomRightLatitude)
-	if conflict {
+	if isConflict(rfilter.TopLeftLatitude, rfilter.BottomRightLatitude) {
 		delta := moveRectangularFilter(&rfilter)
 		movePosition(&pos, delta)
 	}
@@ -102,8 +101,8 @@ func xor(a, b bool) bool {
 }
 
 // checkRectangularConflict returns true if a > b
-func checkReсtangularConflict(a, b float32) bool {
-	return a > b
+func isConflict(leftLatitude, rightLatitude float32) bool {
+	return leftLatitude > rightLatitude
 }
 
 // moveRectangularFilter move filter right latitude to criticalRightLatitude

@@ -77,8 +77,8 @@ func TestMatchRectangularWithConflictMatched(t *testing.T) {
 }
 
 func TestCheckRectangularConflict(t *testing.T) {
-	assert.True(t, checkReсtangularConflict(2, 1))
-	assert.False(t, checkReсtangularConflict(1, 2))
+	assert.True(t, isConflict(2, 1))
+	assert.False(t, isConflict(1, 2))
 }
 
 func TestCheckRectangularConflictMatchedCriticalPosition(t *testing.T) {
