@@ -39,6 +39,7 @@ func (wb *WebFilters) AddFilter(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rw.WriteHeader(http.StatusCreated)
 }
 
 func (wb *WebFilters) GetOneFilterByUser(rw http.ResponseWriter, r *http.Request) {
@@ -47,13 +48,16 @@ func (wb *WebFilters) GetOneFilterByUser(rw http.ResponseWriter, r *http.Request
 	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
+		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if _, err := wb.filters.OneByUser(userID, filterName); err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	rw.WriteHeader(http.StatusAccepted)
 }
 
 func (wb *WebFilters) GetAllFiltersByUser(rw http.ResponseWriter, r *http.Request) {
@@ -61,7 +65,7 @@ func (wb *WebFilters) GetAllFiltersByUser(rw http.ResponseWriter, r *http.Reques
 	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
+		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -75,6 +79,8 @@ func (wb *WebFilters) GetAllFiltersByUser(rw http.ResponseWriter, r *http.Reques
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	rw.WriteHeader(http.StatusOK)
 }
 
 func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
@@ -90,7 +96,7 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusNoContent)
+	rw.WriteHeader(http.StatusOK)
 }
 
 func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
@@ -99,7 +105,7 @@ func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
 	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
+		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -113,4 +119,6 @@ func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	rw.WriteHeader(http.StatusNoContent)
 }

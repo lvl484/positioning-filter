@@ -2,8 +2,8 @@ openapi: 3.0.0
 info:
   description: >-
     A simple HTTP service that exposes APIs to push GPS data, manage
-    notification and filtering rules and user configurations from a set of other
-    services.
+    notification and filtering rules and user configurations 
+    from a set of other services.
   version: "1.0.0-oas3"
   title: Filtering service API
 tags:
@@ -16,8 +16,8 @@ paths:
         - filter
       summary: Creates a new filtering configuration item.
       description: >-
-        This endpoint takes body, decodes it to a filter object, authenticate
-        user, and pushes a new configuration item to a filtering service
+        This endpoint takes body, decodes it to a filter object 
+        and pushes a new configuration item to a filtering service
         associated to the user pushed the request.
       operationId: createFilter
       parameters:
@@ -43,14 +43,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: >-
-            Failed to validate user credentials. Wrond credentials or user does
-            not exist. Responds with the reason of rejection.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -64,8 +56,8 @@ paths:
         - filter
       summary: Returns a list of filtering configurations.
       description: >-
-        This endpoint authenticates user, and returns a list of filtering
-        configurations associated to the user performed the request.
+        This endpoint returns a list of filtering configurations 
+        associated to the user performed the request.
       operationId: getAllFilters
       parameters:
         - name: user_id
@@ -108,14 +100,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: >-
-            Failed to validate user credentials. Wrond credentials or user does
-            not exist. Responds with the reason of rejection.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -124,14 +108,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/users/{user_id}/filters/{id}':
+  '/users/{user_id}/filters/{name}':
     get:
       tags:
         - filter
       summary: Returns a filtering configuration item.
       description: >-
-        This endpoint authenticates user, and returns a filtering configuration
-        item associated with the id provided in path.
+        This endpoint returns a filtering configuration
+        item associated with the name provided in path.
       operationId: getFilter
       parameters:
         - name: user_id
@@ -160,14 +144,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: >-
-            Failed to validate user credentials. Wrond credentials or user does
-            not exist. Responds with the reason of rejection.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -181,10 +157,9 @@ paths:
         - filter
       summary: Updates a filtering configuration item.
       description: >-
-        This endpoint takes body, decodes it to a filter object, authenticate
-        user, and pushes updated configuration item to a filtering service
-        associated to the user pushed the request and id of the item provided in
-        path.
+        This endpoint takes body, decodes it to a filter object and 
+        pushes updated configuration item to a filtering service
+        associated to the user and item name pushed in the request.
       operationId: updateFilter
       parameters:
         - name: user_id
@@ -215,16 +190,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: >-
-            Failed to validate user credentials. Wrond credentials or user does
-            not exist. Responds with the reason of rejection.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: No object found with associated id
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -238,9 +203,8 @@ paths:
         - filter
       summary: Deletes a filtering configuration item.
       description: >-
-        This endpoint authenticate user, and deletes a configuration item from
-        filtering service associated to the user and item id pushed in the
-        request.
+        This endpoint deletes a configuration item from filtering service 
+        associated to the user and item name pushed in the request.
       operationId: deleteFilter
       parameters:
         - name: user_id
@@ -265,16 +229,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: >-
-            Failed to validate user credentials. Wrond credentials or user does
-            not exist. Responds with the reason of rejection.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: No object found with associated id
         '500':
           description: >-
             Some failure during request handling. Responds with description of
