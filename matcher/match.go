@@ -23,6 +23,7 @@ type matcherFilters struct {
 	filters repository.Filters
 }
 
+// Match checks if given position is matched with at least one filter
 func (m matcherFilters) Match(pos position.Position) (bool, error) {
 	filters, err := m.filters.AllByUser(pos.UserID)
 	if err != nil {
