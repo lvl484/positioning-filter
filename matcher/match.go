@@ -104,7 +104,7 @@ func xor(a, b bool) bool {
 	return (a && !b) || (!a && b)
 }
 
-// isConflict returns true if leftLatitude > rightLatitude
+// if leftLatitude > rightLatitude filter crosses twelve meridian and makes conflicts in matching
 func isConflict(leftLatitude, rightLatitude float32) bool {
 	return leftLatitude > rightLatitude
 }
