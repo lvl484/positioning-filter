@@ -41,6 +41,21 @@ func (wb *WebFilters) AddFilter(rw http.ResponseWriter, r *http.Request) {
 
 }
 
+func (wb *WebFilters) GetOneFilterByUser(rw http.ResponseWriter, r *http.Request) {
+	m := mux.Vars(r)
+	filterName := m[name]
+	userIDstring := m[userID]
+	userID, err := uuid.Parse(userIDstring)
+	if err != nil {
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if _, err := wb.filters.OneByUser(userID, filterName); err != nil {
+		return
+	}
+}
+
 func (wb *WebFilters) GetAllFiltersByUser(rw http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	userIDstring := m[userID]
@@ -62,21 +77,6 @@ func (wb *WebFilters) GetAllFiltersByUser(rw http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (wb *WebFilters) GetOneFilterByUser(rw http.ResponseWriter, r *http.Request) {
-	m := mux.Vars(r)
-	filterName := m[name]
-	userIDstring := m[userID]
-	userID, err := uuid.Parse(userIDstring)
-	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	if _, err := wb.filters.OneByUser(userID, filterName); err != nil {
-		return
-	}
-}
-
 func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 	var filter repository.Filter
 
@@ -85,16 +85,7 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := mux.Vars(r)
-	filterName := m[name]
-	userIDstring := m[userID]
-	userID, err := uuid.Parse(userIDstring)
-	if err != nil {
-		rw.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	if err := wb.filters.Update(userID, filterName, &filter); err != nil {
+	if err := wb.filters.Update(&filter); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -104,14 +95,13 @@ func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 
 func (wb *WebFilters) DeleteFilter(rw http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
+	filterName := m[name]
 	userIDstring := m[userID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
-
-	filterName := m[name]
 
 	filters := wb.filters.Delete(userID, filterName)
 	if err != nil {
