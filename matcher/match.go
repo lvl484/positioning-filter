@@ -100,7 +100,7 @@ func xor(a, b bool) bool {
 	return (a && !b) || (!a && b)
 }
 
-// checkRectangularConflict returns true if a > b
+// checkRectangularConflict returns true if leftLatitude > rightLatitude
 func isConflict(leftLatitude, rightLatitude float32) bool {
 	return leftLatitude > rightLatitude
 }
