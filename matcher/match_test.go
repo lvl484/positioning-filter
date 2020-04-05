@@ -23,6 +23,14 @@ func TestXor(t *testing.T) {
 	assert.True(t, xor(true, false))
 }
 
+func TestMatchRoundCriticalPosition(t *testing.T) {
+	filter := newTestRoundFilter(-179, 0, 100, false)
+	position := newTestPosition(178, 0)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+
 func TestMatchRoundMatched(t *testing.T) {
 	filter := newTestRoundFilter(0, 0, 50, false)
 	position := newTestPosition(30, 40)

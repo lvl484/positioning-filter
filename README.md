@@ -68,3 +68,7 @@ PF_PASSWORD -password for user
 ```bash
 docker-compose up --build -d  
 ```
+
+### Known issues  
+  
+Matching position with round filters around twelve meridian can returns wrong result  

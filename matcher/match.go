@@ -85,6 +85,8 @@ func matchRectangular(pos position.Position, filter *repository.Filter) (bool, e
 	return xor(matched, filter.Reversed), nil
 }
 
+// matchRound has issue with matching over twelve meridian.
+// Return false when position and filter center are on different sides of it
 func matchRound(pos position.Position, filter *repository.Filter) (bool, error) {
 	var rfilter repository.RoundFilter
 	if err := json.Unmarshal(filter.Configuration, &rfilter); err != nil {
