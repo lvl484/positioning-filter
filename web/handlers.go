@@ -72,7 +72,7 @@ func (wb *WebFilters) GetOneFilterByUser(rw http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if err := wb.filters.OneByUser(userID, filterName); err != nil {
+	if _, err := wb.filters.OneByUser(userID, filterName); err != nil {
 		return
 	}
 }

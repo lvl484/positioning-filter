@@ -1,0 +1,4 @@
+ALTER TABLE filters DROP CONSTRAINT unique_user_filtername;
+ALTER TABLE filters ALTER COLUMN user_id TYPE VARCHAR(20);
+ALTER TABLE filters DROP COLUMN id;
+ALTER TABLE filters ADD CONSTRAINT UNIQUE(name);

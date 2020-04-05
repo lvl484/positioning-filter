@@ -1,0 +1,5 @@
+ALTER TABLE filters DROP CONSTRAINT filters_name_key;
+ALTER TABLE filters ADD COLUMN id SERIAL PRIMARY KEY;
+ALTER TABLE filters ALTER COLUMN user_id DROP DEFAULT;
+ALTER TABLE filters ALTER COLUMN user_id SET DATA TYPE UUID USING user_id::UUID;
+ALTER TABLE filters ADD CONSTRAINT unique_user_filtername UNIQUE(user_id, name);

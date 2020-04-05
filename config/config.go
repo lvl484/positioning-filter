@@ -19,8 +19,10 @@ const (
 	postgresPass = "postgres.Pass"
 	postgresDB   = "postgres.DB"
 
-	loggerHost = "logger.Host"
-	loggerPort = "logger.Port"
+	loggerHost     = "logger.Host"
+	loggerPort     = "logger.Port"
+	loggerOutput   = "logger.Output"
+	loggerFileName = "logger.FileName"
 
 	kafkaHost            = "kafka.Host"
 	kafkaPort            = "kafka.Port"
@@ -66,8 +68,10 @@ func (vcfg *Config) NewDBConfig() *storage.DBConfig {
 // NewLoggerConfig returns pointer to logger.Config with data read from viper.config.json
 func (vcfg *Config) NewLoggerConfig() *logger.Config {
 	return &logger.Config{
-		Host: vcfg.v.GetString(loggerHost),
-		Port: vcfg.v.GetString(loggerPort),
+		Host:     vcfg.v.GetString(loggerHost),
+		Port:     vcfg.v.GetString(loggerPort),
+		Output:   vcfg.v.GetString(loggerOutput),
+		FileName: vcfg.v.GetString(loggerFileName),
 	}
 }
 

@@ -3,14 +3,16 @@ package main
 import (
 	"flag"
 	"io"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/lvl484/positioning-filter/logger"
+
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -31,17 +33,23 @@ func main() {
 		log.Fatal(err)
 	}
 
+	loggerConfig := viper.NewLoggerConfig()
+	if err := logger.NewLogger(loggerConfig); err != nil {
+		log.Println(err)
+		return
+	}
+
 	consulConfig := viper.NewConsulConfig()
 	agentConfig := consulConfig.AgentConfig()
 	consulClient, err := consulConfig.NewClient()
 
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 
 	if err = consulConfig.ServiceRegister(consulClient, agentConfig); err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 
@@ -51,7 +59,7 @@ func main() {
 	db, err := storage.Connect(postgresConfig)
 
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 
@@ -64,11 +72,11 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
-	log.Println("Recieved", sig, "signal")
+	log.Info("Recieved", sig, "signal")
 
 	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
-		log.Println(err)
+		log.Error(err)
 	}
 
-	log.Println("Service successfuly shutdown")
+	log.Info("Service successfuly shutdown")
 }

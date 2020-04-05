@@ -19,3 +19,6 @@
 
 # Directory for postgres data
 postgresData/
+
+# Logger
+*.log

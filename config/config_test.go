@@ -80,8 +80,10 @@ func TestConfigNewLoggerConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	want := &logger.Config{
-		Host: "HOST3",
-		Port: "PORT3",
+		Host:     "HOST3",
+		Port:     "PORT3",
+		Output:   "OUTPUT3",
+		FileName: "FILENAME3",
 	}
 
 	got := v.NewLoggerConfig()
