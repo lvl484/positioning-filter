@@ -111,6 +111,7 @@ func isConflict(leftLatitude, rightLatitude float32) bool {
 func moveRectangularFilter(r *repository.RectangularFilter) float32 {
 	delta := criticalRightLatitude + r.BottomRightLatitude
 	r.BottomRightLatitude -= delta
+	// move out from overlapping with degrees border from 180 to -180
 	r.BottomRightLatitude += 360
 	r.TopLeftLatitude -= delta
 
@@ -121,6 +122,7 @@ func moveRectangularFilter(r *repository.RectangularFilter) float32 {
 func movePosition(p *position.Position, delta float32) {
 	p.Latitude -= delta
 	if p.Latitude <= criticalLeftLatitude {
+		// move out from overlapping with degrees border from 180 to -180
 		p.Latitude += 360
 	}
 }
