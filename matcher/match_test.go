@@ -16,6 +16,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestXor(t *testing.T) {
+	assert.False(t, xor(false, false))
+	assert.False(t, xor(true, true))
+	assert.True(t, xor(false, true))
+	assert.True(t, xor(true, false))
+}
+
 func TestMatchRoundMatched(t *testing.T) {
 	filter := newTestRoundFilter(0, 0, 50, false)
 	position := newTestPosition(30, 40)
@@ -58,6 +65,35 @@ func TestMatchRoundFail(t *testing.T) {
 	position := newTestPosition(-31, 40)
 	matched, err := matchRound(position, filter)
 	assert.NotNil(t, err)
+	assert.False(t, matched)
+}
+
+func TestMatchRectangularWithConflictMatched(t *testing.T) {
+	filter := newTestRectangularFilter(177, 4, -177, 1, false)
+	position := newTestPosition(178, 2)
+	matched, err := matchRectangular(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+
+func TestCheckRectangularConflict(t *testing.T) {
+	assert.True(t, checkReсtangularConflict(2, 1))
+	assert.False(t, checkReсtangularConflict(1, 2))
+}
+
+func TestCheckRectangularConflictMatchedCriticalPosition(t *testing.T) {
+	filter := newTestRectangularFilter(177, 4, -177, 1, false)
+	position := newTestPosition(-178, 2)
+	matched, err := matchRectangular(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+
+func TestCheckRectangularConflictNotMatchedCriticalPosition(t *testing.T) {
+	filter := newTestRectangularFilter(177, 4, -177, 1, false)
+	position := newTestPosition(-176, 2)
+	matched, err := matchRectangular(position, filter)
+	assert.NoError(t, err)
 	assert.False(t, matched)
 }
 

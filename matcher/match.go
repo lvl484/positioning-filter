@@ -12,6 +12,9 @@ import (
 
 const (
 	ErrBadFilterType = "Bad type of filter"
+
+	criticalLeftLatitude  float32 = -180
+	criticalRightLatitude float32 = 180
 )
 
 type matcher func(position.Position, *repository.Filter) (bool, error)
@@ -31,6 +34,7 @@ func (m matcherFilters) Match(pos position.Position) (bool, error) {
 		if err != nil {
 			return false, err
 		}
+
 		matched, err := match(pos, filter)
 
 		if err != nil {
@@ -66,22 +70,18 @@ func matchRectangular(pos position.Position, filter *repository.Filter) (bool, e
 		return false, err
 	}
 
-	if !(rfilter.BottomRightLatitude > pos.Latitude) ||
-		!(rfilter.TopLeftLatitude < pos.Latitude) ||
-		!(rfilter.BottomRightLongitude < pos.Longitude) ||
-		!(rfilter.TopLeftLongitude > pos.Longitude) {
-		if filter.Reversed {
-			return true, nil
-		}
-
-		return false, nil
+	conflict := checkReсtangularConflict(rfilter.TopLeftLatitude, rfilter.BottomRightLatitude)
+	if conflict {
+		delta := moveRectangularFilter(&rfilter)
+		movePosition(&pos, delta)
 	}
 
-	if filter.Reversed {
-		return false, nil
-	}
+	matched := rfilter.BottomRightLatitude > pos.Latitude &&
+		rfilter.TopLeftLatitude < pos.Latitude &&
+		rfilter.BottomRightLongitude < pos.Longitude &&
+		rfilter.TopLeftLongitude > pos.Longitude
 
-	return true, nil
+	return xor(matched, filter.Reversed), nil
 }
 
 func matchRound(pos position.Position, filter *repository.Filter) (bool, error) {
@@ -90,19 +90,38 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 		return false, err
 	}
 
-	if (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
-		(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) >
-		(rfilter.Radius * rfilter.Radius) {
-		if filter.Reversed {
-			return true, nil
-		}
+	matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
+		(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
+		(rfilter.Radius * rfilter.Radius)
 
-		return false, nil
+	return xor(matched, filter.Reversed), nil
+}
+
+func xor(a, b bool) bool {
+	return (a && !b) || (!a && b)
+}
+
+// checkRectangularConflict returns true if a > b
+func checkReсtangularConflict(a, b float32) bool {
+	return a > b
+}
+
+// moveRectangularFilter move filter right latitude to criticalRightLatitude
+// and left latitude to point
+// got by subtraction delta from original left latitude
+func moveRectangularFilter(r *repository.RectangularFilter) float32 {
+	delta := criticalRightLatitude + r.BottomRightLatitude
+	r.BottomRightLatitude -= delta
+	r.BottomRightLatitude += 360
+	r.TopLeftLatitude -= delta
+
+	return delta
+}
+
+// movePosition moves position latitude to point got by subtraction delta from position latitude
+func movePosition(p *position.Position, delta float32) {
+	p.Latitude -= delta
+	if p.Latitude <= criticalLeftLatitude {
+		p.Latitude += 360
 	}
-
-	if filter.Reversed {
-		return false, nil
-	}
-
-	return true, nil
 }
