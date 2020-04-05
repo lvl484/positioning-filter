@@ -72,12 +72,14 @@ docker-compose up --build -d
 ### Known issues  
   
 Matching position with round filters around twelve meridian can returns wrong result  
-
-# examples  
+  
+**description**  
+if filter contains area from two sides of twelve meridian and
+position and filter center are on different sides, matchRound returns wrong result  
+  
+### examples  
   
 ```
 with (positionLatitude = 179, filterCenterLatitude = 178, filterRadius = 10) matchRound returns true  
 with (positionLatitude = -179, filterCenterLatitude = 178, filterRadius = 10) matchRound returns false  
-if filter contains area from two sides of twelve meridian and
-position and filter center are on different sides, matchRound returns wrong result
 ```  
