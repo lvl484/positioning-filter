@@ -86,8 +86,8 @@ func TestMatchRoundMatched(t *testing.T) {
 }
 
 func TestMatchRoundNotMatched(t *testing.T) {
-	filter := newTestRoundFilter(1, 1, 50, false)
-	position := newTestPosition(-31.001, 41)
+	filter := newTestRoundFilter(0, 0, 50, false)
+	position := newTestPosition(-30.001, 40)
 	matched, err := matchRound(position, filter)
 	assert.NoError(t, err)
 	assert.False(t, matched)
