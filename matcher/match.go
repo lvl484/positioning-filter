@@ -117,12 +117,6 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 			(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude)))*(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude))) <=
 			float64(rfilter.Radius*rfilter.Radius)
 		return xor(or(preMatched, matched), filter.Reversed), nil
-	//round filter canter in safe position (not near to 180)
-	case !(limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius) <= 0) && !((limit/2 - math.Abs(float64(rfilter.CentreLongitude)) - float64(rfilter.Radius)) <= 0):
-		matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
-			(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
-			(rfilter.Radius * rfilter.Radius)
-		return xor(or(preMatched, matched), filter.Reversed), nil
 	default:
 		return false, nil
 	}
