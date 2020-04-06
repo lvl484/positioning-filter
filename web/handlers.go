@@ -86,10 +86,20 @@ func (wb *WebFilters) GetAllFiltersByUser(rw http.ResponseWriter, r *http.Reques
 func (wb *WebFilters) UpdateFilter(rw http.ResponseWriter, r *http.Request) {
 	var filter repository.Filter
 
+	vars := mux.Vars(r)
+
 	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	filter.Name = vars[name]
+	userIDstring := vars[userID]
+	userUUID, err := uuid.Parse(userIDstring)
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	filter.UserID = userUUID
 
 	if err := wb.filters.Update(&filter); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)

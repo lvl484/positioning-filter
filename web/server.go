@@ -14,7 +14,7 @@ type WebServer struct {
 }
 
 func NewWebServer(filters repository.Filters, port string) *WebServer {
-	router := NewRouter(filters)
+	router := newRouter(filters)
 	return &WebServer{
 		&http.Server{
 			Addr:    port,

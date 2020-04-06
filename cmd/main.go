@@ -25,6 +25,7 @@ func main() {
 
 	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
+	//servicePort := flag.String("p", "8000", "Service port")
 
 	flag.Parse()
 
@@ -62,6 +63,8 @@ func main() {
 		log.Error(err)
 		return
 	}
+
+	//srv := web.NewWebServer(filters, *servicePort)
 
 	components = append(components,
 		//Put connection variables here
