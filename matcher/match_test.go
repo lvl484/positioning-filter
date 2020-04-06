@@ -63,6 +63,14 @@ func TestMatchRoundCriticalPosition5(t *testing.T) {
 	assert.True(t, matched)
 }
 
+func TestMatchRoundCriticalPosition6(t *testing.T) {
+	filter := newTestRoundFilter(-179, 0, 10, false)
+	position := newTestPosition(-170, 0)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+
 func TestMatchRoundMatched(t *testing.T) {
 	filter := newTestRoundFilter(0, 0, 50, false)
 	position := newTestPosition(30, 40)
