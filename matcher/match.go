@@ -92,46 +92,37 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 	if err := json.Unmarshal(filter.Configuration, &rfilter); err != nil {
 		return false, err
 	}
+	preMatched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
+		(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
+		(rfilter.Radius * rfilter.Radius)
+	if preMatched {
+		return xor(preMatched, filter.Reversed), nil
+	}
 	switch {
 	//round filter longitude and lalilude in critical position(near to +-180)
 	case (limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius)) <= 0 && (limit/2-math.Abs(float64(rfilter.CentreLongitude))-float64(rfilter.Radius)) <= 0:
-		if matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
-			(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
-			(rfilter.Radius * rfilter.Radius); matched == true {
-			return xor(matched, filter.Reversed), nil
-		}
 		matched := (limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))*(limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))+
 			(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude)))*(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude))) <=
 			float64(rfilter.Radius*rfilter.Radius)
-		return xor(matched, filter.Reversed), nil
+		return xor(or(preMatched, matched), filter.Reversed), nil
 	//round filter lalilude in critical position(near to +-180)
 	case (limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius)) <= 0 && !((limit/2 - math.Abs(float64(rfilter.CentreLongitude)) - float64(rfilter.Radius)) <= 0):
-		if matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
-			(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
-			(rfilter.Radius * rfilter.Radius); matched == true {
-			return xor(matched, filter.Reversed), nil
-		}
 		matched := (limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))*(limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))+
 			float64((pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude)) <=
 			float64(rfilter.Radius*rfilter.Radius)
-		return xor(matched, filter.Reversed), nil
+		return xor(or(preMatched, matched), filter.Reversed), nil
 	//round filter longitude in critical position(near to +-180)
 	case !((limit/2 - math.Abs(float64(rfilter.CenterLatitude)) - float64(rfilter.Radius)) <= 0) && (limit/2-math.Abs(float64(rfilter.CentreLongitude))-float64(rfilter.Radius)) <= 0:
-		if matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
-			(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
-			(rfilter.Radius * rfilter.Radius); matched == true {
-			return xor(matched, filter.Reversed), nil
-		}
 		matched := float64((pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude))+
 			(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude)))*(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude))) <=
 			float64(rfilter.Radius*rfilter.Radius)
-		return xor(matched, filter.Reversed), nil
+		return xor(or(preMatched, matched), filter.Reversed), nil
 	//round filter canter in safe position (not near to 180)
 	case !(limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius) <= 0) && !((limit/2 - math.Abs(float64(rfilter.CentreLongitude)) - float64(rfilter.Radius)) <= 0):
 		matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
 			(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
 			(rfilter.Radius * rfilter.Radius)
-		return xor(matched, filter.Reversed), nil
+		return xor(or(preMatched, matched), filter.Reversed), nil
 	default:
 		return false, nil
 	}
@@ -139,6 +130,10 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 
 func xor(a, b bool) bool {
 	return (a && !b) || (!a && b)
+}
+
+func or(a, b bool) bool {
+	return a || b
 }
 
 // if leftLatitude > rightLatitude filter crosses twelve meridian and makes conflicts in matching
