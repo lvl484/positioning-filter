@@ -3,8 +3,8 @@ package repository
 
 //RectangularFilter keeps configuration for filtering inside rectangular area
 type RectangularFilter struct {
-	TopLeftLatitude       float32
-	TopLeftLongtitude     float32
-	BottomRightLatitude   float32
-	BottomRightLongtitude float32
+	TopLeftLatitude      float32
+	TopLeftLongitude     float32
+	BottomRightLatitude  float32
+	BottomRightLongitude float32
 }
