@@ -43,6 +43,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401'
+
+
+        
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -92,7 +96,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Filter'
-        '400':
+        '401':
           description: >-
             Invalid request body/headers/etc. format. Responds with description
             of what's wrong.
@@ -136,7 +140,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FilterWithId'
-        '400':
+        '401':
           description: >-
             Invalid request body/headers/etc. format. Responds with description
             of what's wrong.
@@ -221,6 +225,26 @@ paths:
       responses:
         '200':
           description: Succesfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterWithId'
+        '400':
+          description: >-
+            Invalid request body/headers/etc. format. Responds with description
+            of what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: >-
+            Some failure during request handling. Responds with description of
+            what's wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 servers:
   - url: 'http://localhost:8080/v1'
 components:

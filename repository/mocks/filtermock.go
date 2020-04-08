@@ -50,18 +50,18 @@ func (mr *MockFiltersMockRecorder) Add(filter interface{}) *gomock.Call {
 }
 
 // OneByUser mocks base method
-func (m *MockFilters) OneByUser(userID uuid.UUID, name string) (*repository.Filter, error) {
+func (m *MockFilters) OneByUser(userID uuid.UUID, filterName string) (*repository.Filter, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OneByUser", userID, name)
+	ret := m.ctrl.Call(m, "OneByUser", userID, filterName)
 	ret0, _ := ret[0].(*repository.Filter)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // OneByUser indicates an expected call of OneByUser
-func (mr *MockFiltersMockRecorder) OneByUser(userID, name interface{}) *gomock.Call {
+func (mr *MockFiltersMockRecorder) OneByUser(userID, filterName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OneByUser", reflect.TypeOf((*MockFilters)(nil).OneByUser), userID, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OneByUser", reflect.TypeOf((*MockFilters)(nil).OneByUser), userID, filterName)
 }
 
 // AllByUser mocks base method
@@ -79,6 +79,21 @@ func (mr *MockFiltersMockRecorder) AllByUser(userID interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllByUser", reflect.TypeOf((*MockFilters)(nil).AllByUser), userID)
 }
 
+// OffsetByUser mocks base method
+func (m *MockFilters) OffsetByUser(userID uuid.UUID, offset int) ([]*repository.Filter, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OffsetByUser", userID, offset)
+	ret0, _ := ret[0].([]*repository.Filter)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// OffsetByUser indicates an expected call of OffsetByUser
+func (mr *MockFiltersMockRecorder) OffsetByUser(userID, offset interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OffsetByUser", reflect.TypeOf((*MockFilters)(nil).OffsetByUser), userID, offset)
+}
+
 // Update mocks base method
 func (m *MockFilters) Update(filter *repository.Filter) error {
 	m.ctrl.T.Helper()
@@ -94,15 +109,15 @@ func (mr *MockFiltersMockRecorder) Update(filter interface{}) *gomock.Call {
 }
 
 // Delete mocks base method
-func (m *MockFilters) Delete(userID uuid.UUID, name string) error {
+func (m *MockFilters) Delete(userID uuid.UUID, filterName string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", userID, name)
+	ret := m.ctrl.Call(m, "Delete", userID, filterName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete
-func (mr *MockFiltersMockRecorder) Delete(userID, name interface{}) *gomock.Call {
+func (mr *MockFiltersMockRecorder) Delete(userID, filterName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockFilters)(nil).Delete), userID, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockFilters)(nil).Delete), userID, filterName)
 }

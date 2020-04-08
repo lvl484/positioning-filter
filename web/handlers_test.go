@@ -86,7 +86,7 @@ func TestGetOneFilterByUserSuccess(t *testing.T) {
 	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusAccepted, res.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestGetOneFilterByUserFailDB(t *testing.T) {
@@ -116,10 +116,10 @@ func TestGetOneFilterByUserFailParseUUID(t *testing.T) {
 	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, "err", filter.Name)
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 }
 
-func TestGetAllByUserSuccess(t *testing.T) {
+func TestGetOffsetSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
@@ -130,7 +130,7 @@ func TestGetAllByUserSuccess(t *testing.T) {
 	filter2 := newTestFilter("Name2", "round")
 	both := []*repository.Filter{filter1, filter2}
 
-	filters.EXPECT().AllByUser(filter1.UserID).Return(both, nil)
+	filters.EXPECT().OffsetByUser(filter1.UserID, 0).Return(both, nil)
 
 	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, filter1.UserID)
 	res, err := http.Get(urlString)
@@ -138,7 +138,7 @@ func TestGetAllByUserSuccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestGetAllByUserFailDB(t *testing.T) {
+func TestGetOffsetFailDB(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
@@ -147,7 +147,7 @@ func TestGetAllByUserFailDB(t *testing.T) {
 
 	filter1 := newTestFilter("Name1", "round")
 
-	filters.EXPECT().AllByUser(filter1.UserID).Return(nil, errors.New("Err"))
+	filters.EXPECT().OffsetByUser(filter1.UserID, 0).Return(nil, errors.New("Err"))
 
 	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, filter1.UserID)
 	res, err := http.Get(urlString)
@@ -155,7 +155,7 @@ func TestGetAllByUserFailDB(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 }
 
-func TestGetAllByUserFailParseUUID(t *testing.T) {
+func TestGetOffsetFailParseUUID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
@@ -165,7 +165,7 @@ func TestGetAllByUserFailParseUUID(t *testing.T) {
 	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, "err")
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 }
 
 func TestUpdateFilterSuccess(t *testing.T) {
@@ -214,26 +214,6 @@ func TestUpdateFilterFailDB(t *testing.T) {
 	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
-}
-
-func TestDeleteFilterSuccess(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
-
-	filter := newTestFilter("Name1", "round")
-	filters.EXPECT().Delete(filter.UserID, filter.Name).Return(nil)
-
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
-	req, err := http.NewRequest(http.MethodDelete, urlString, nil)
-	assert.NoError(t, err)
-	client := &http.Client{}
-	res, err := client.Do(req)
-	assert.NoError(t, err)
-
-	assert.Equal(t, http.StatusNoContent, res.StatusCode)
 }
 
 func newTestFilter(filterName, filterType string) *repository.Filter {
