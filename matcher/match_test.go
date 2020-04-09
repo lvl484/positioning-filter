@@ -22,12 +22,6 @@ func TestXor(t *testing.T) {
 	assert.True(t, xor(false, true))
 	assert.True(t, xor(true, false))
 }
-func TestOr(t *testing.T) {
-	assert.False(t, or(false, false))
-	assert.True(t, or(true, true))
-	assert.True(t, or(false, true))
-	assert.True(t, or(true, false))
-}
 
 func TestMatchRoundCriticalPosition(t *testing.T) {
 	filter := newTestRoundFilter(-179, 0, 100, false)

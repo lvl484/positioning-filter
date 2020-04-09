@@ -86,6 +86,11 @@ func matchRectangular(pos position.Position, filter *repository.Filter) (bool, e
 	return xor(matched, filter.Reversed), nil
 }
 
+//matchRound calculates position of a point to a circle filter. firstly check by formula (x-x0)^2+(y-y0)^2<=r^2
+//x,y-point coordinares,x0,y0-filter center coordinates, r-filter radius
+//if point is inside the circle- returns xor(true, Reversed)
+//if not, checks is distance between circle center and +-180 less than radius(separately x and y),than instead of (x-x0) uses (360-x-x0) in default formula
+//for each ordinate which hearest to 180 than radius.
 func matchRound(pos position.Position, filter *repository.Filter) (bool, error) {
 	var rfilter repository.RoundFilter
 	var limit float64 = 360
@@ -99,30 +104,30 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 		return xor(preMatched, filter.Reversed), nil
 	}
 	switch {
-	//round filter longitude and lalilude in critical position(near to +-180)
+	//round filter longitude and lalilude in critical position(near to +-180)  (360-x-x0)^2+(360-y-y0)^2<=0
 	case (limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius)) <= 0 && (limit/2-math.Abs(float64(rfilter.CentreLongitude))-float64(rfilter.Radius)) <= 0:
 		matched := (limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))*(limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))+
 			(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude)))*(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude))) <=
 			float64(rfilter.Radius*rfilter.Radius)
-		return xor(or(preMatched, matched), filter.Reversed), nil
-	//round filter lalilude in critical position(near to +-180)
+		return xor(matched, filter.Reversed), nil
+	//round filter lalilude in critical position(near to +-180)  (x-x0)^2+(360-y-y0)^2<=0
 	case (limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius)) <= 0 && !((limit/2 - math.Abs(float64(rfilter.CentreLongitude)) - float64(rfilter.Radius)) <= 0):
 		matched := (limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))*(limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))+
 			float64((pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude)) <=
 			float64(rfilter.Radius*rfilter.Radius)
-		return xor(or(preMatched, matched), filter.Reversed), nil
-	//round filter longitude in critical position(near to +-180)
+		return xor(matched, filter.Reversed), nil
+	//round filter longitude in critical position(near to +-180) (360-x-x0)^2+(y-y0)^2<=0
 	case !((limit/2 - math.Abs(float64(rfilter.CenterLatitude)) - float64(rfilter.Radius)) <= 0) && (limit/2-math.Abs(float64(rfilter.CentreLongitude))-float64(rfilter.Radius)) <= 0:
 		matched := float64((pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude))+
 			(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude)))*(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude))) <=
 			float64(rfilter.Radius*rfilter.Radius)
-		return xor(or(preMatched, matched), filter.Reversed), nil
-	//round filter canter in safe position (not near to 180)
+		return xor(matched, filter.Reversed), nil
+	//round filter canter in safe position (not near to 180)  (x-x0)^2+(y-y0)^2<=0 . need this to check reversed for false preMatched
 	case !(limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius) <= 0) && !((limit/2 - math.Abs(float64(rfilter.CentreLongitude)) - float64(rfilter.Radius)) <= 0):
 		matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
 			(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
 			(rfilter.Radius * rfilter.Radius)
-		return xor(or(preMatched, matched), filter.Reversed), nil
+		return xor(matched, filter.Reversed), nil
 	default:
 		return false, nil
 	}
@@ -130,10 +135,6 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 
 func xor(a, b bool) bool {
 	return (a && !b) || (!a && b)
-}
-
-func or(a, b bool) bool {
-	return a || b
 }
 
 // if leftLatitude > rightLatitude filter crosses twelve meridian and makes conflicts in matching
