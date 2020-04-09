@@ -71,7 +71,7 @@ func main() {
 	go srv.Run()
 
 	components = append(components,
-		//Put connection variables here
+		srv,
 		db)
 
 	sigs := make(chan os.Signal)
@@ -85,5 +85,5 @@ func main() {
 		log.Error(err)
 	}
 
-	log.Info("Service successfuly shutdown")
+	log.Info("Service successfully shutdown")
 }

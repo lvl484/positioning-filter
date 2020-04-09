@@ -11,7 +11,7 @@ const (
 	addQuery       = "INSERT INTO FILTERS(name,type,configuration,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
 	getOneQuery    = "SELECT name, type, configuration, reversed, user_id FROM FILTERS WHERE user_id=$1 AND name=$2"
 	getAllQuery    = "SELECT name, type, configuration, reversed, user_id  FROM FILTERS WHERE user_id=$1"
-	getOffsetQuery = "SELECT name, type, configuration, reversed, user_id  FROM FILTERS WHERE user_id=$1 ORDER BY name LIMIT=$2 OFFSET=$3"
+	getOffsetQuery = "SELECT name, type, configuration, reversed, user_id  FROM FILTERS WHERE user_id=$1 ORDER BY name LIMIT $2 OFFSET $3"
 	updateQuery    = "UPDATE FILTERS SET (type,configuration,reversed) = ($1,$2,$3) WHERE user_id=$4 AND name=$5"
 	deleteQuery    = "DELETE FROM FILTERS WHERE user_id=$1 AND name=$2"
 
