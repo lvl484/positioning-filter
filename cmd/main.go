@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/lvl484/positioning-filter/logger"
+	"github.com/lvl484/positioning-filter/repository"
+	"github.com/lvl484/positioning-filter/web"
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
@@ -25,7 +27,7 @@ func main() {
 
 	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
-	//servicePort := flag.String("p", "8000", "Service port")
+	servicePort := flag.String("p", ":8000", "Service port")
 
 	flag.Parse()
 
@@ -64,7 +66,9 @@ func main() {
 		return
 	}
 
-	//srv := web.NewWebServer(filters, *servicePort)
+	filters := repository.NewFiltersRepository(db)
+	srv := web.NewWebServer(filters, *servicePort)
+	go srv.Run()
 
 	components = append(components,
 		//Put connection variables here
@@ -75,7 +79,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
-	log.Info("Recieved", sig, "signal")
+	log.Info("Received", sig, "signal")
 
 	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
 		log.Error(err)
