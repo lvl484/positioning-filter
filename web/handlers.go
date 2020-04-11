@@ -118,7 +118,7 @@ func (repo *repo) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 	userUUID, err := uuid.Parse(userIDstring)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	filter.UserID = userUUID
@@ -137,7 +137,7 @@ func (repo *repo) DeleteFilter(w http.ResponseWriter, r *http.Request) {
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
