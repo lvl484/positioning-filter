@@ -4,13 +4,13 @@ package web
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/lvl484/positioning-filter/repository"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -34,6 +34,7 @@ func (handler *handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 
 	userid, err := uuid.Parse(userIDstring)
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -41,6 +42,7 @@ func (handler *handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 	var filter repository.Filter
 
 	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -48,6 +50,7 @@ func (handler *handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 	filter.UserID = userid
 
 	if err := handler.filters.Add(&filter); err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -62,17 +65,20 @@ func (handler *handler) GetOneFilter(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(userIDstring)
 
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	f, err := handler.filters.OneByUser(userID, filterName)
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(f); err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
@@ -84,6 +90,7 @@ func (handler *handler) GetOffset(w http.ResponseWriter, r *http.Request) {
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -91,16 +98,18 @@ func (handler *handler) GetOffset(w http.ResponseWriter, r *http.Request) {
 	offsetString := r.URL.Query().Get("offset")
 	offset, err := strconv.Atoi(offsetString)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 	}
 
 	filters, err := handler.filters.OffsetByUser(userID, offset)
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(filters); err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -118,17 +127,20 @@ func (handler *handler) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 	userUUID, err := uuid.Parse(userIDstring)
 
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	filter.UserID = userUUID
 
 	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if err := handler.filters.Update(&filter); err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -142,17 +154,20 @@ func (handler *handler) DeleteFilter(w http.ResponseWriter, r *http.Request) {
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	filters := handler.filters.Delete(userID, filterName)
 	if err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(filters); err != nil {
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
