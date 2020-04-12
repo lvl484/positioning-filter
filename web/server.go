@@ -13,11 +13,11 @@ type WebServer struct {
 	server *http.Server
 }
 
-func NewWebServer(filters repository.Filters, port string) *WebServer {
+func NewWebServer(filters repository.Filters, addr string) *WebServer {
 	router := newRouter(filters)
 	return &WebServer{
 		&http.Server{
-			Addr:    port,
+			Addr:    addr,
 			Handler: router,
 		},
 	}

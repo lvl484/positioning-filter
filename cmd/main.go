@@ -27,7 +27,7 @@ func main() {
 
 	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
-	servicePort := flag.String("p", ":8000", "Service port")
+	serviceAddr := flag.String("p", ":8000", "Service addr")
 
 	flag.Parse()
 
@@ -67,7 +67,7 @@ func main() {
 	}
 
 	filters := repository.NewFiltersRepository(db)
-	srv := web.NewWebServer(filters, *servicePort)
+	srv := web.NewWebServer(filters, *serviceAddr)
 	go srv.Run()
 
 	components = append(components,

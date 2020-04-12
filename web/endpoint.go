@@ -10,10 +10,10 @@ import (
 )
 
 func newRouter(filters repository.Filters) *mux.Router {
-	handle := newRepo(filters)
+	handle := newHandler(filters)
 
 	router := mux.NewRouter()
-	filtersRouter := router.PathPrefix("/v1/router/{user_id}/filters").Subrouter()
+	filtersRouter := router.PathPrefix("/users/{user_id}/filters").Subrouter()
 
 	filtersRouter.HandleFunc("/", handle.AddFilter).Methods(http.MethodPost)
 	filtersRouter.HandleFunc("/", handle.GetOffset).Methods(http.MethodGet)

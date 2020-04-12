@@ -4,6 +4,7 @@ package web
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -17,17 +18,17 @@ const (
 	inputName   = "name"
 )
 
-type repo struct {
+type handler struct {
 	filters repository.Filters
 }
 
-func newHandler(filters repository.Filters) *repo {
-	return &repo{
+func newHandler(filters repository.Filters) *handler {
+	return &handler{
 		filters: filters,
 	}
 }
 
-func (repo *repo) AddFilter(w http.ResponseWriter, r *http.Request) {
+func (handler *handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userIDstring := vars[inputUserID]
 
@@ -46,7 +47,7 @@ func (repo *repo) AddFilter(w http.ResponseWriter, r *http.Request) {
 
 	filter.UserID = userid
 
-	if err := repo.filters.Add(&filter); err != nil {
+	if err := handler.filters.Add(&filter); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -54,7 +55,7 @@ func (repo *repo) AddFilter(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (repo *repo) GetOneFilter(w http.ResponseWriter, r *http.Request) {
+func (handler *handler) GetOneFilter(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	filterName := m[inputName]
 	userIDstring := m[inputUserID]
@@ -65,7 +66,7 @@ func (repo *repo) GetOneFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	f, err := repo.filters.OneByUser(userID, filterName)
+	f, err := handler.filters.OneByUser(userID, filterName)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -78,7 +79,7 @@ func (repo *repo) GetOneFilter(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (repo *repo) GetOffset(w http.ResponseWriter, r *http.Request) {
+func (handler *handler) GetOffset(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
@@ -90,10 +91,10 @@ func (repo *repo) GetOffset(w http.ResponseWriter, r *http.Request) {
 	offsetString := r.URL.Query().Get("offset")
 	offset, err := strconv.Atoi(offsetString)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
 	}
 
-	filters, err := repo.filters.OffsetByUser(userID, offset)
+	filters, err := handler.filters.OffsetByUser(userID, offset)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -107,7 +108,7 @@ func (repo *repo) GetOffset(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (repo *repo) UpdateFilter(w http.ResponseWriter, r *http.Request) {
+func (handler *handler) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 	var filter repository.Filter
 
 	vars := mux.Vars(r)
@@ -127,7 +128,7 @@ func (repo *repo) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := repo.filters.Update(&filter); err != nil {
+	if err := handler.filters.Update(&filter); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -135,7 +136,7 @@ func (repo *repo) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (repo *repo) DeleteFilter(w http.ResponseWriter, r *http.Request) {
+func (handler *handler) DeleteFilter(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	filterName := m[inputName]
 	userIDstring := m[inputUserID]
@@ -145,7 +146,7 @@ func (repo *repo) DeleteFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filters := repo.filters.Delete(userID, filterName)
+	filters := handler.filters.Delete(userID, filterName)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
