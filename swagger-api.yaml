@@ -91,7 +91,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Filter'
-        '404':
+        '401':
         description: >-
           Failed to validate user credentials. Wrong credentials or user does
           not exist. Responds with the reason of rejection.
@@ -135,7 +135,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FilterWithId'
-        '401':
+        '404':
         description: >-
           Failed to validate user credentials. Wrong credentials or user does
           not exist. Responds with the reason of rejection.

@@ -31,7 +31,7 @@ func TestAddFilterSuccees(t *testing.T) {
 	b, err := json.Marshal(&filter)
 	assert.NoError(t, err)
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, filter.UserID)
+	urlString := fmt.Sprintf("%s/users/%s/filters/", srv.URL, filter.UserID)
 	res, err := http.Post(urlString, "application/json", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
@@ -48,7 +48,7 @@ func TestAddFilterFailDecode(t *testing.T) {
 	b, err := json.Marshal("b")
 	assert.NoError(t, err)
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, filter.UserID)
+	urlString := fmt.Sprintf("%s/users/%s/filters/", srv.URL, filter.UserID)
 	res, err := http.Post(urlString, "application/json", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
@@ -67,7 +67,7 @@ func TestAddFilterFailDB(t *testing.T) {
 	b, err := json.Marshal(&filter)
 	assert.NoError(t, err)
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, filter.UserID)
+	urlString := fmt.Sprintf("%s/users/%s/filters/", srv.URL, filter.UserID)
 	res, err := http.Post(urlString, "application/json", bytes.NewBuffer(b))
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
@@ -83,7 +83,7 @@ func TestGetOneFilterByUserSuccess(t *testing.T) {
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().OneByUser(filter.UserID, filter.Name).Return(filter, nil)
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
+	urlString := fmt.Sprintf("%s/users/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -99,7 +99,7 @@ func TestGetOneFilterByUserFailDB(t *testing.T) {
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().OneByUser(filter.UserID, filter.Name).Return(nil, errors.New("Error"))
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
+	urlString := fmt.Sprintf("%s/users/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
@@ -113,10 +113,10 @@ func TestGetOneFilterByUserFailParseUUID(t *testing.T) {
 	defer srv.Close()
 
 	filter := newTestFilter("Name1", "round")
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, "err", filter.Name)
+	urlString := fmt.Sprintf("%s/users/%s/filters/%s", srv.URL, "err", filter.Name)
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func TestGetOffsetSuccess(t *testing.T) {
@@ -132,7 +132,7 @@ func TestGetOffsetSuccess(t *testing.T) {
 
 	filters.EXPECT().OffsetByUser(filter1.UserID, 0).Return(both, nil)
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, filter1.UserID)
+	urlString := fmt.Sprintf("%s/users/%s/filters/", srv.URL, filter1.UserID)
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -149,7 +149,7 @@ func TestGetOffsetFailDB(t *testing.T) {
 
 	filters.EXPECT().OffsetByUser(filter1.UserID, 0).Return(nil, errors.New("Err"))
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, filter1.UserID)
+	urlString := fmt.Sprintf("%s/users/%s/filters/", srv.URL, filter1.UserID)
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
@@ -162,7 +162,7 @@ func TestGetOffsetFailParseUUID(t *testing.T) {
 	srv := httptest.NewServer(newRouter(filters))
 	defer srv.Close()
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/", srv.URL, "err")
+	urlString := fmt.Sprintf("%s/users/%s/filters/", srv.URL, "err")
 	res, err := http.Get(urlString)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -181,7 +181,7 @@ func TestUpdateFilterSuccess(t *testing.T) {
 	b, err := json.Marshal(&filter)
 	assert.NoError(t, err)
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
+	urlString := fmt.Sprintf("%s/users/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
 	req, err := http.NewRequest(http.MethodPatch, urlString, bytes.NewBuffer(b))
 	assert.NoError(t, err)
 	client := &http.Client{}
@@ -205,7 +205,7 @@ func TestUpdateFilterFailDB(t *testing.T) {
 	b, err := json.Marshal(&filter)
 	assert.NoError(t, err)
 
-	urlString := fmt.Sprintf("%s/v1/router/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
+	urlString := fmt.Sprintf("%s/users/%s/filters/%s", srv.URL, filter.UserID, filter.Name)
 	req, err := http.NewRequest(http.MethodPatch, urlString, bytes.NewBuffer(b))
 	assert.NoError(t, err)
 	client := &http.Client{}
