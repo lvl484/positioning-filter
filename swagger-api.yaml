@@ -45,7 +45,7 @@ paths:
                 $ref: '#/components/schemas/Error'
         '401':
           description: >-
-            Failed to validate user credentials. Wrond credentials or user does
+            Failed to validate user credentials. Wrong credentials or user does
             not exist. Responds with the reason of rejection.
           content:
             application/json:
@@ -93,7 +93,7 @@ paths:
                   $ref: '#/components/schemas/Filter'
         '401':
         description: >-
-          Failed to validate user credentials. Wrond credentials or user does
+          Failed to validate user credentials. Wrong credentials or user does
           not exist. Responds with the reason of rejection.
         content:
           application/json:
@@ -137,7 +137,7 @@ paths:
                 $ref: '#/components/schemas/FilterWithId'
         '401':
         description: >-
-          Failed to validate user credentials. Wrond credentials or user does
+          Failed to validate user credentials. Wrong credentials or user does
           not exist. Responds with the reason of rejection.
         content:
           application/json:
@@ -191,7 +191,7 @@ paths:
                 $ref: '#/components/schemas/Error'
         '401':
         description: >-
-          Failed to validate user credentials. Wrond credentials or user does
+          Failed to validate user credentials. Wrong credentials or user does
           not exist. Responds with the reason of rejection.
         content:
           application/json:
@@ -234,7 +234,7 @@ paths:
                 $ref: '#/components/schemas/FilterWithId'
         '401':
         description: >-
-          Failed to validate user credentials. Wrond credentials or user does
+          Failed to validate user credentials. Wrong credentials or user does
           not exist. Responds with the reason of rejection.
         content:
           application/json:
