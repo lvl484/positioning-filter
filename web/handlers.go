@@ -21,7 +21,7 @@ type repo struct {
 	filters repository.Filters
 }
 
-func newRepo(filters repository.Filters) *repo {
+func newHandler(filters repository.Filters) *repo {
 	return &repo{
 		filters: filters,
 	}
@@ -61,7 +61,7 @@ func (repo *repo) GetOneFilter(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(userIDstring)
 
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -88,7 +88,10 @@ func (repo *repo) GetOffset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	offsetString := r.URL.Query().Get("offset")
-	offset, _ := strconv.Atoi(offsetString)
+	offset, err := strconv.Atoi(offsetString)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 
 	filters, err := repo.filters.OffsetByUser(userID, offset)
 	if err != nil {
@@ -109,10 +112,6 @@ func (repo *repo) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
-	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 	filter.Name = vars[inputName]
 	userIDstring := vars[inputUserID]
 	userUUID, err := uuid.Parse(userIDstring)
@@ -122,6 +121,11 @@ func (repo *repo) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filter.UserID = userUUID
+
+	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	if err := repo.filters.Update(&filter); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -137,7 +141,7 @@ func (repo *repo) DeleteFilter(w http.ResponseWriter, r *http.Request) {
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
