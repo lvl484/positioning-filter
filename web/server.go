@@ -24,8 +24,7 @@ func NewWebServer(filters repository.Filters, addr string) *WebServer {
 }
 
 func (ws *WebServer) Close() error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := context.Background()
 	return ws.server.Shutdown(ctx)
 }
 
