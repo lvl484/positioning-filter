@@ -7,14 +7,15 @@ import (
 	"net/http"
 
 	"github.com/lvl484/positioning-filter/repository"
+	"github.com/sirupsen/logrus"
 )
 
 type WebServer struct {
 	server *http.Server
 }
 
-func NewWebServer(filters repository.Filters, addr string) *WebServer {
-	router := newRouter(filters)
+func NewWebServer(filters repository.Filters, addr string, log *logrus.Logger) *WebServer {
+	router := newRouter(filters, log)
 	return &WebServer{
 		&http.Server{
 			Addr:    addr,

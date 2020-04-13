@@ -15,15 +15,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/lvl484/positioning-filter/repository"
 	mockFilter "github.com/lvl484/positioning-filter/repository/mocks"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	log = logrus.New()
 )
 
 func TestAddFilterSuccees(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().Add(filter).Return(nil)
@@ -41,8 +45,7 @@ func TestAddFilterFailDecode(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	b, err := json.Marshal("b")
@@ -58,8 +61,7 @@ func TestAddFilterFailDB(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().Add(filter).Return(errors.New("Error"))
@@ -77,8 +79,7 @@ func TestGetOneFilterByUserSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().OneByUser(filter.UserID, filter.Name).Return(filter, nil)
@@ -93,8 +94,7 @@ func TestGetOneFilterByUserFailDB(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().OneByUser(filter.UserID, filter.Name).Return(nil, errors.New("Error"))
@@ -109,8 +109,7 @@ func TestGetOneFilterByUserFailParseUUID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	urlString := fmt.Sprintf("%s/users/%s/filters/%s", srv.URL, "err", filter.Name)
@@ -123,8 +122,7 @@ func TestGetOffsetSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter1 := newTestFilter("Name1", "round")
 	filter2 := newTestFilter("Name2", "round")
@@ -142,8 +140,7 @@ func TestGetOffsetFailDB(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter1 := newTestFilter("Name1", "round")
 
@@ -159,8 +156,7 @@ func TestGetOffsetFailParseUUID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	urlString := fmt.Sprintf("%s/users/%s/filters/", srv.URL, "err")
 	res, err := http.Get(urlString)
@@ -172,8 +168,7 @@ func TestUpdateFilterSuccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().Update(filter).Return(nil)
@@ -196,8 +191,7 @@ func TestUpdateFilterFailDB(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	filters := mockFilter.NewMockFilters(ctrl)
-	srv := httptest.NewServer(newRouter(filters))
-	defer srv.Close()
+	srv := httptest.NewServer(newRouter(filters, log))
 
 	filter := newTestFilter("Name1", "round")
 	filters.EXPECT().Update(filter).Return(errors.New("Err"))

@@ -7,10 +7,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/lvl484/positioning-filter/repository"
+	"github.com/sirupsen/logrus"
 )
 
-func newRouter(filters repository.Filters) *mux.Router {
-	handle := newHandler(filters)
+func newRouter(filters repository.Filters, log *logrus.Logger) *mux.Router {
+	handle := newHandler(filters, log)
 
 	router := mux.NewRouter()
 	filtersRouter := router.PathPrefix("/users/{user_id}/filters").Subrouter()
