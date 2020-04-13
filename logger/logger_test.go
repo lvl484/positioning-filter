@@ -7,7 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -81,15 +83,6 @@ func TestNewLogger(t *testing.T) {
 	}
 }
 
-func TestLogConfigsetLoggerToFile(t *testing.T) {
-
-	_, err := os.OpenFile("positioning_filter_test.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
-
-	if err != nil {
-		t.Errorf("Config.setLoggerToFile() error = %v", err)
-	}
-}
-
 func TestConfigsetLoggerToGraylog(t *testing.T) {
 	v := viper.New()
 	v.AddConfigPath("../config/")
@@ -136,4 +129,26 @@ func TestConfigsetLoggerToGraylog(t *testing.T) {
 			}
 		})
 	}
+}
+func TestLogConfigsetLoggerToStdout(t *testing.T) {
+	confStdout := &Config{
+		Output: "Stdout",
+	}
+
+	logger := logrus.New()
+	confStdout.setLoggerToStdout(logger)
+
+	assert.Equal(t, os.Stdout, logger.Out)
+}
+
+func TestLogConfigsetLoggerToFile(t *testing.T) {
+	confFile := &Config{
+		Output:   "File",
+		FileName: "positioning_filter_test.log",
+	}
+
+	logger := logrus.New()
+	err := confFile.setLoggerToFile(logger)
+	assert.NoError(t, err)
+	assert.NotNil(t, logger.Out)
 }
