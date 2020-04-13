@@ -89,48 +89,31 @@ func matchRectangular(pos position.Position, filter *repository.Filter) (bool, e
 //matchRound calculates position of a point to a circle filter. firstly check by formula (x-x0)^2+(y-y0)^2<=r^2
 //x,y-point coordinares,x0,y0-filter center coordinates, r-filter radius
 //if point is inside the circle- returns xor(true, Reversed)
-//if not, checks is distance between circle center and +-180 less than radius(separately x and y),than instead of (x-x0) uses (360-x-x0) in default formula
-//for each ordinate which hearest to 180 than radius.
+//if not, checks is distance between circle center and +-180 less than radius(longitude only),than instead of (y-y0) uses (360-y-y0) in default formula
 func matchRound(pos position.Position, filter *repository.Filter) (bool, error) {
 	var rfilter repository.RoundFilter
-	var limit float64 = 360
 	if err := json.Unmarshal(filter.Configuration, &rfilter); err != nil {
 		return false, err
 	}
-	preMatched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
-		(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
-		(rfilter.Radius * rfilter.Radius)
+	preMatched := matchHalfVector(pos.Latitude, rfilter.CenterLatitude)+matchHalfVector(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
 	if preMatched {
 		return xor(preMatched, filter.Reversed), nil
 	}
-	switch {
-	//round filter longitude and lalilude in critical position(near to +-180)  (360-x-x0)^2+(360-y-y0)^2<=0
-	case (limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius)) <= 0 && (limit/2-math.Abs(float64(rfilter.CentreLongitude))-float64(rfilter.Radius)) <= 0:
-		matched := (limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))*(limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))+
-			(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude)))*(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude))) <=
-			float64(rfilter.Radius*rfilter.Radius)
+	if checkLongitude(rfilter.CentreLongitude, rfilter.Radius) {
+		matched := matchHalfVector(pos.Latitude, rfilter.CenterLatitude)+matchHalfVectorInvert(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
 		return xor(matched, filter.Reversed), nil
-	//round filter lalilude in critical position(near to +-180)  (x-x0)^2+(360-y-y0)^2<=0
-	case (limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius)) <= 0 && !((limit/2 - math.Abs(float64(rfilter.CentreLongitude)) - float64(rfilter.Radius)) <= 0):
-		matched := (limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))*(limit-math.Abs(float64(pos.Latitude))-math.Abs(float64(rfilter.CenterLatitude)))+
-			float64((pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude)) <=
-			float64(rfilter.Radius*rfilter.Radius)
-		return xor(matched, filter.Reversed), nil
-	//round filter longitude in critical position(near to +-180) (360-x-x0)^2+(y-y0)^2<=0
-	case !((limit/2 - math.Abs(float64(rfilter.CenterLatitude)) - float64(rfilter.Radius)) <= 0) && (limit/2-math.Abs(float64(rfilter.CentreLongitude))-float64(rfilter.Radius)) <= 0:
-		matched := float64((pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude))+
-			(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude)))*(limit-math.Abs(float64(pos.Longitude))-math.Abs(float64(rfilter.CentreLongitude))) <=
-			float64(rfilter.Radius*rfilter.Radius)
-		return xor(matched, filter.Reversed), nil
-	//round filter canter in safe position (not near to 180)  (x-x0)^2+(y-y0)^2<=0 . need this to check reversed for false preMatched
-	case !(limit/2-math.Abs(float64(rfilter.CenterLatitude))-float64(rfilter.Radius) <= 0) && !((limit/2 - math.Abs(float64(rfilter.CentreLongitude)) - float64(rfilter.Radius)) <= 0):
-		matched := (pos.Latitude-rfilter.CenterLatitude)*(pos.Latitude-rfilter.CenterLatitude)+
-			(pos.Longitude-rfilter.CentreLongitude)*(pos.Longitude-rfilter.CentreLongitude) <=
-			(rfilter.Radius * rfilter.Radius)
-		return xor(matched, filter.Reversed), nil
-	default:
-		return false, nil
 	}
+	return xor(preMatched, filter.Reversed), nil
+}
+
+func checkLongitude(centreLong, radius float32) bool {
+	return (180 - math.Abs(float64(centreLong)) - float64(radius)) <= 0
+}
+func matchHalfVector(x1, x2 float32) float32 {
+	return (x1 - x2) * (x1 - x2)
+}
+func matchHalfVectorInvert(x1, x2 float32) float32 {
+	return float32((360 - math.Abs(float64(x1)) - math.Abs(float64(x2))) * (360 - math.Abs(float64(x1)) - math.Abs(float64(x2))))
 }
 
 func xor(a, b bool) bool {
