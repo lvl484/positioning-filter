@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 	graylog "gopkg.in/gemnasium/logrus-graylog-hook.v2"
 )
 
@@ -18,44 +17,45 @@ const (
 var ErrBadLogDestination = errors.New("logger: bad destination for logger ")
 
 // NewLogger initialized logger according to configuration
-func NewLogger(lc *Config) error {
+func NewLogger(lc *Config) (*logrus.Logger, error) {
 	var err error
+	logger := logrus.New()
 	switch lc.Output {
 	case "Stdout":
-		lc.setLoggerToStdout()
+		lc.setLoggerToStdout(logger)
 	case "File":
-		err = lc.setLoggerToFile()
+		err = lc.setLoggerToFile(logger)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	case "Graylog":
-		lc.setLoggerToGraylog()
+		lc.setLoggerToGraylog(logger)
 	default:
 		err = ErrBadLogDestination
-		return err
+		return nil, err
 	}
-	return nil
+	return logger, nil
 }
 
 // setLoggerToFile initialize logger for writing to file
-func (lc *Config) setLoggerToFile() error {
+func (lc *Config) setLoggerToFile(logger *logrus.Logger) error {
 	f, err := os.OpenFile(lc.FileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
-	log.SetFormatter(&log.JSONFormatter{})
-	log.SetOutput(f)
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	logger.SetOutput(f)
 	return err
 }
 
 // setLoggerToStdout initialize logger for writing to stdout
-func (lc *Config) setLoggerToStdout() {
+func (lc *Config) setLoggerToStdout(logger *logrus.Logger) {
 	formatter := &logrus.TextFormatter{
 		FullTimestamp: true,
 	}
-	log.SetFormatter(formatter)
-	log.SetOutput(os.Stdout)
+	logger.SetFormatter(formatter)
+	logger.SetOutput(os.Stdout)
 }
 
 // setLoggerToGraylog initialize logger for writing to Graylog
-func (lc *Config) setLoggerToGraylog() {
+func (lc *Config) setLoggerToGraylog(logger *logrus.Logger) {
 	hook := graylog.NewGraylogHook(lc.Host+":"+lc.Port, map[string]interface{}{srctype: srcname})
-	log.AddHook(hook)
+	logger.AddHook(hook)
 }
