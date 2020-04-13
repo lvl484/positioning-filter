@@ -7,9 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -30,9 +28,10 @@ func TestNewLogger(t *testing.T) {
 	}
 
 	conf := &Config{
-		Host:   v.GetString(loggerHost),
-		Port:   v.GetString(loggerPort),
-		Output: v.GetString(loggerOutput),
+		Host:     v.GetString(loggerHost),
+		Port:     v.GetString(loggerPort),
+		Output:   v.GetString(loggerOutput),
+		FileName: v.GetString(loggerFileName),
 	}
 	incorrectConf := &Config{
 		Host:   "locallviv",
@@ -40,7 +39,8 @@ func TestNewLogger(t *testing.T) {
 		Output: "Graynlog13",
 	}
 	confFile := &Config{
-		Output: "File",
+		Output:   "File",
+		FileName: "positioning_filter_test.log",
 	}
 	confStdout := &Config{
 		Output: "Stdout",
@@ -72,7 +72,7 @@ func TestNewLogger(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := NewLogger(tt.lc)
+			_, err := NewLogger(tt.lc)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewLogger() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -88,22 +88,6 @@ func TestLogConfigsetLoggerToFile(t *testing.T) {
 	if err != nil {
 		t.Errorf("Config.setLoggerToFile() error = %v", err)
 	}
-}
-
-func TestLogConfigsetLoggerToStdout(t *testing.T) {
-
-	confFile := &Config{
-		Output: "Filename",
-	}
-	confStdout := &Config{
-		Output: "Stdout",
-	}
-
-	confStdout.setLoggerToStdout()
-	assert.Equal(t, os.Stdout, log.StandardLogger().Out)
-	confFile.setLoggerToStdout()
-	assert.Equal(t, os.Stdout, log.StandardLogger().Out)
-
 }
 
 func TestConfigsetLoggerToGraylog(t *testing.T) {
@@ -145,7 +129,7 @@ func TestConfigsetLoggerToGraylog(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := NewLogger(tt.lc)
+			_, err := NewLogger(tt.lc)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewLogger() error = %v, wantErr %v", err, tt.wantErr)
 				return
