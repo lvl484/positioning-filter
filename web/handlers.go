@@ -30,13 +30,14 @@ func newHandler(filters repository.Filters, log *logrus.Logger) *handler {
 	}
 }
 
-func (handler *handler) AddFilter(w http.ResponseWriter, r *http.Request) {
+func (h *handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userIDstring := vars[inputUserID]
 
 	userid, err := uuid.Parse(userIDstring)
+
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't parse UserID from URL query: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -44,55 +45,57 @@ func (handler *handler) AddFilter(w http.ResponseWriter, r *http.Request) {
 	var filter repository.Filter
 
 	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't decode request body: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	filter.UserID = userid
 
-	if err := handler.filters.Add(&filter); err != nil {
-		handler.log.Error(err)
+	if err := h.filters.Add(&filter); err != nil {
+		h.log.Errorf("Can't add filter to database: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	h.log.Infof("Added filter %v for user %v", filter.Name, filter.UserID)
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (handler *handler) GetOneFilter(w http.ResponseWriter, r *http.Request) {
+func (h *handler) GetOneFilter(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	filterName := m[inputName]
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
 
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't parse UserID from URL query: %v", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	f, err := handler.filters.OneByUser(userID, filterName)
+	f, err := h.filters.OneByUser(userID, filterName)
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't get filter from database: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(f); err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't encode body: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+	h.log.Infof("Got one filter %v for user %v", filterName, userID)
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (handler *handler) GetOffset(w http.ResponseWriter, r *http.Request) {
+func (h *handler) GetOffset(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't parse UserID from URL query: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -100,26 +103,27 @@ func (handler *handler) GetOffset(w http.ResponseWriter, r *http.Request) {
 	offsetString := r.URL.Query().Get("offset")
 	offset, err := strconv.Atoi(offsetString)
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't convert offset to integer: %v", err)
 	}
 
-	filters, err := handler.filters.OffsetByUser(userID, offset)
+	filters, err := h.filters.OffsetByUser(userID, offset)
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't get filters from database: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(filters); err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't encode body: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	h.log.Infof("Got filters for user %v", userID)
 	w.WriteHeader(http.StatusOK)
 }
 
-func (handler *handler) UpdateFilter(w http.ResponseWriter, r *http.Request) {
+func (h *handler) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 	var filter repository.Filter
 
 	vars := mux.Vars(r)
@@ -129,50 +133,52 @@ func (handler *handler) UpdateFilter(w http.ResponseWriter, r *http.Request) {
 	userUUID, err := uuid.Parse(userIDstring)
 
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't parse UserID from URL query: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	filter.UserID = userUUID
 
 	if err := json.NewDecoder(r.Body).Decode(&filter); err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't decode request body: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if err := handler.filters.Update(&filter); err != nil {
-		handler.log.Error(err)
+	if err := h.filters.Update(&filter); err != nil {
+		h.log.Errorf("Can't update filter in database: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	h.log.Infof("Updated filter %v for user %v", filter.Name, filter.UserID)
 	w.WriteHeader(http.StatusOK)
 }
 
-func (handler *handler) DeleteFilter(w http.ResponseWriter, r *http.Request) {
+func (h *handler) DeleteFilter(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
 	filterName := m[inputName]
 	userIDstring := m[inputUserID]
 	userID, err := uuid.Parse(userIDstring)
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't parse UserID from URL query: %v", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	filters := handler.filters.Delete(userID, filterName)
+	filters := h.filters.Delete(userID, filterName)
 	if err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't delete filter in database: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(filters); err != nil {
-		handler.log.Error(err)
+		h.log.Errorf("Can't encode body: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	h.log.Infof("Deleted filter %v for user %v", filterName, userID)
 	w.WriteHeader(http.StatusNoContent)
 }
