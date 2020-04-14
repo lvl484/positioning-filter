@@ -92,13 +92,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/Filter'
         '401':
-        description: >-
-          Failed to validate user credentials. Wrong credentials or user does
-          not exist. Responds with the reason of rejection.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Error'
+          description: >-
+            Failed to validate user credentials. Wrong credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -136,13 +136,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/FilterWithId'
         '404':
-        description: >-
-          Failed to validate user credentials. Wrong credentials or user does
-          not exist. Responds with the reason of rejection.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Error'
+          description: >-
+            Failed to validate user credentials. Wrong credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -190,13 +190,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '401':
-        description: >-
-          Failed to validate user credentials. Wrong credentials or user does
-          not exist. Responds with the reason of rejection.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Error'
+          description: >-
+            Failed to validate user credentials. Wrong credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: >-
             Some failure during request handling. Responds with description of
@@ -233,13 +233,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/FilterWithId'
         '404':
-        description: >-
-          Failed to validate user credentials. Wrong credentials or user does
-          not exist. Responds with the reason of rejection.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Error'
+          description: >-
+            Failed to validate user credentials. Wrong credentials or user does
+            not exist. Responds with the reason of rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: >-
             Some failure during request handling. Responds with description of
