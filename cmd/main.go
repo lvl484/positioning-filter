@@ -68,7 +68,7 @@ func main() {
 	}
 
 	filters := repository.NewFiltersRepository(db)
-	srv := web.NewWebServer(filters, *serviceAddr)
+	srv := web.NewWebServer(filters, *serviceAddr, logger)
 	go srv.Run()
 
 	components = append(components,
