@@ -10,13 +10,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type WebServer struct {
+type Server struct {
 	server *http.Server
 }
 
-func NewWebServer(filters repository.Filters, addr string, log *logrus.Logger) *WebServer {
+func NewServer(filters repository.Filters, addr string, log *logrus.Logger) *Server {
 	router := newRouter(filters, log)
-	return &WebServer{
+
+	return &Server{
 		&http.Server{
 			Addr:    addr,
 			Handler: router,
@@ -24,11 +25,11 @@ func NewWebServer(filters repository.Filters, addr string, log *logrus.Logger) *
 	}
 }
 
-func (ws *WebServer) Close() error {
+func (ws *Server) Close() error {
 	ctx := context.Background()
 	return ws.server.Shutdown(ctx)
 }
 
-func (ws *WebServer) Run() error {
+func (ws *Server) Run() error {
 	return ws.server.ListenAndServe()
 }

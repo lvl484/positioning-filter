@@ -68,7 +68,7 @@ func main() {
 	}
 
 	filters := repository.NewFiltersRepository(db)
-	srv := web.NewWebServer(filters, *serviceAddr, logger)
+	srv := web.NewServer(filters, *serviceAddr, logger)
 	go srv.Run()
 
 	components = append(components,
@@ -80,11 +80,11 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
-	logger.Info("Recieved", sig, "signal")
+	logger.Info("Received", sig, "signal")
 
 	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
 		logger.Error(err)
 	}
 
-	logger.Info("Service successfuly shutdown")
+	logger.Info("Service successfully shutdown")
 }
