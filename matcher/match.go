@@ -107,7 +107,6 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 	}
 	return xor(preMatched, filter.Reversed), nil
 }
-
 func checkLongitude(centreLong, radius float32) bool {
 	return maxLongitude-abs(centreLong)-radius <= 0
 }
