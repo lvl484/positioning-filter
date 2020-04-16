@@ -112,7 +112,7 @@ func checkLongitude(centreLong, radius float32) bool {
 	return maxCoordinate-abs(centreLong)-radius <= 0
 }
 func calcHalfVector(x1, x2 float32) float32 {
-	return (x1 - x2) * (x1 - x2)
+	return pow(x1 - x2)
 }
 func calcHalfVectorInvert(x1, x2 float32) float32 {
 	return pow(maxCoordinate*2 - abs(x1) - abs(x2))
