@@ -10,6 +10,13 @@ tags:
   - name: filter
     description: Filtering service interactions API
 paths:
+  /health:
+    get:
+      tags:
+        - consul_healthcheck
+      responses:
+        '200':
+          description: 'Healthcheck for consul.'
   /users/{user_id}/filters:
     post:
       tags:

@@ -103,7 +103,7 @@ func main() {
 
 	go consumer.Consume(matcher, producer)
 
-	srv := web.NewWebServer(filters, *serviceAddr, logger)
+	srv := web.NewServer(filters, *serviceAddr, logger)
 
 	go func() {
 		if err := srv.Run(); err != nil {
