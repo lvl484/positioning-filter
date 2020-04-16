@@ -16,7 +16,7 @@ const (
 
 	criticalLeftLatitude  float32 = -180
 	criticalRightLatitude float32 = 180
-	maxCoordinate         float32 = 180
+	maxLongitude          float32 = 180
 )
 
 type matcher func(position.Position, *repository.Filter) (bool, error)
@@ -97,25 +97,25 @@ func matchRound(pos position.Position, filter *repository.Filter) (bool, error) 
 	if err := json.Unmarshal(filter.Configuration, &rfilter); err != nil {
 		return false, err
 	}
-	preMatched := calcHalfVector(pos.Latitude, rfilter.CenterLatitude)+calcHalfVector(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
+	preMatched := calcHalfVector(pos.Latitude, rfilter.CenterLatitude)+calcHalfVector(pos.Longitude, rfilter.CentreLongitude) <= pow(rfilter.Radius)
 	if preMatched {
 		return xor(preMatched, filter.Reversed), nil
 	}
 	if checkLongitude(rfilter.CentreLongitude, rfilter.Radius) {
-		matched := calcHalfVector(pos.Latitude, rfilter.CenterLatitude)+calcHalfVectorInvert(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
+		matched := calcHalfVector(pos.Latitude, rfilter.CenterLatitude)+calcHalfVectorInvert(pos.Longitude, rfilter.CentreLongitude) <= pow(rfilter.Radius)
 		return xor(matched, filter.Reversed), nil
 	}
 	return xor(preMatched, filter.Reversed), nil
 }
 
 func checkLongitude(centreLong, radius float32) bool {
-	return maxCoordinate-abs(centreLong)-radius <= 0
+	return maxLongitude-abs(centreLong)-radius <= 0
 }
 func calcHalfVector(x1, x2 float32) float32 {
 	return pow(x1 - x2)
 }
 func calcHalfVectorInvert(x1, x2 float32) float32 {
-	return pow(maxCoordinate*2 - abs(x1) - abs(x2))
+	return pow(maxLongitude*2 - abs(x1) - abs(x2))
 }
 func pow(x float32) float32 {
 	return x * x
