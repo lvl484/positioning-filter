@@ -8,17 +8,21 @@ import (
 )
 
 const (
-	addQuery    = "INSERT INTO FILTERS(name,type,configuration,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
-	getOneQuery = "SELECT name, type, configuration, reversed, user_id FROM FILTERS WHERE user_id=$1 AND name=$2"
-	getAllQuery = "SELECT name, type, configuration, reversed, user_id  FROM FILTERS WHERE user_id=$1"
-	updateQuery = "UPDATE FILTERS SET (type,configuration,reversed) = ($1,$2,$3) WHERE user_id=$4 AND name=$5"
-	deleteQuery = "DELETE FROM FILTERS WHERE user_id=$1 AND name=$2"
+	addQuery       = "INSERT INTO FILTERS(name,type,configuration,reversed,user_id) VALUES ($1,$2,$3,$4,$5)"
+	getOneQuery    = "SELECT name, type, configuration, reversed, user_id FROM FILTERS WHERE user_id=$1 AND name=$2"
+	getAllQuery    = "SELECT name, type, configuration, reversed, user_id  FROM FILTERS WHERE user_id=$1"
+	getOffsetQuery = "SELECT name, type, configuration, reversed, user_id  FROM FILTERS WHERE user_id=$1 ORDER BY name LIMIT $2 OFFSET $3"
+	updateQuery    = "UPDATE FILTERS SET (type,configuration,reversed) = ($1,$2,$3) WHERE user_id=$4 AND name=$5"
+	deleteQuery    = "DELETE FROM FILTERS WHERE user_id=$1 AND name=$2"
+
+	defaultLimit = 20
 )
 
 type Filters interface {
 	Add(filter *Filter) error
 	OneByUser(userID uuid.UUID, filterName string) (*Filter, error)
 	AllByUser(userID uuid.UUID) ([]*Filter, error)
+	OffsetByUser(userID uuid.UUID, offset int) ([]*Filter, error)
 	Update(filter *Filter) error
 	Delete(userID uuid.UUID, filterName string) error
 }
@@ -58,6 +62,34 @@ func (p *filtersRepo) AllByUser(userID uuid.UUID) ([]*Filter, error) {
 	filters := []*Filter{}
 
 	rows, err := p.db.Query(getAllQuery, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		f := new(Filter)
+		err = rows.Scan(&f.Name, &f.Type, &f.Configuration, &f.Reversed, &f.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		filters = append(filters, f)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return filters, nil
+}
+
+// OffsetByUser returns set of filters for relevant user with offset
+func (p *filtersRepo) OffsetByUser(userID uuid.UUID, offset int) ([]*Filter, error) {
+	filters := []*Filter{}
+
+	rows, err := p.db.Query(getOffsetQuery, userID, defaultLimit, offset)
 	if err != nil {
 		return nil, err
 	}

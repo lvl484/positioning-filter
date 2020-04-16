@@ -15,6 +15,7 @@ import (
 	"github.com/lvl484/positioning-filter/matcher"
 	"github.com/lvl484/positioning-filter/repository"
 	"github.com/lvl484/positioning-filter/storage"
+	"github.com/lvl484/positioning-filter/web"
 )
 
 const (
@@ -26,6 +27,7 @@ func main() {
 
 	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
+	serviceAddr := flag.String("p", ":8000", "Service addr")
 
 	flag.Parse()
 
@@ -101,16 +103,32 @@ func main() {
 
 	go consumer.Consume(matcher, producer)
 
+	srv := web.NewWebServer(filters, *serviceAddr, logger)
+
+	go func() {
+		if err := srv.Run(); err != nil {
+			logger.Error(err)
+
+			if err := gracefulShutdown(shutdownTimeout, components); err != nil {
+				logger.Error(err)
+			}
+
+			os.Exit(1)
+		}
+	}()
+
+	components = append(components, srv)
+
 	sigs := make(chan os.Signal)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
-	logger.Info("Recieved", sig, "signal")
+	logger.Info("Received", sig, "signal")
 
 	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
 		logger.Error(err)
 	}
 
-	logger.Info("Service successfuly shutdown")
+	logger.Info("Service successfully shutdown")
 }
