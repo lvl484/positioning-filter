@@ -16,6 +16,7 @@ const (
 
 	criticalLeftLatitude  float32 = -180
 	criticalRightLatitude float32 = 180
+	maxCoordinate         float32 = 180
 )
 
 type matcher func(position.Position, *repository.Filter) (bool, error)
@@ -92,28 +93,35 @@ func matchRectangular(pos position.Position, filter *repository.Filter) (bool, e
 //if not, checks is distance between circle center and +-180 less than radius(longitude only),than instead of (y-y0) uses (360-y-y0) in default formula
 func matchRound(pos position.Position, filter *repository.Filter) (bool, error) {
 	var rfilter repository.RoundFilter
+
 	if err := json.Unmarshal(filter.Configuration, &rfilter); err != nil {
 		return false, err
 	}
-	preMatched := matchHalfVector(pos.Latitude, rfilter.CenterLatitude)+matchHalfVector(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
+	preMatched := calcHalfVector(pos.Latitude, rfilter.CenterLatitude)+calcHalfVector(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
 	if preMatched {
 		return xor(preMatched, filter.Reversed), nil
 	}
 	if checkLongitude(rfilter.CentreLongitude, rfilter.Radius) {
-		matched := matchHalfVector(pos.Latitude, rfilter.CenterLatitude)+matchHalfVectorInvert(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
+		matched := calcHalfVector(pos.Latitude, rfilter.CenterLatitude)+calcHalfVectorInvert(pos.Longitude, rfilter.CentreLongitude) <= (rfilter.Radius * rfilter.Radius)
 		return xor(matched, filter.Reversed), nil
 	}
 	return xor(preMatched, filter.Reversed), nil
 }
 
 func checkLongitude(centreLong, radius float32) bool {
-	return (180 - math.Abs(float64(centreLong)) - float64(radius)) <= 0
+	return maxCoordinate-abs(centreLong)-radius <= 0
 }
-func matchHalfVector(x1, x2 float32) float32 {
+func calcHalfVector(x1, x2 float32) float32 {
 	return (x1 - x2) * (x1 - x2)
 }
-func matchHalfVectorInvert(x1, x2 float32) float32 {
-	return float32((360 - math.Abs(float64(x1)) - math.Abs(float64(x2))) * (360 - math.Abs(float64(x1)) - math.Abs(float64(x2))))
+func calcHalfVectorInvert(x1, x2 float32) float32 {
+	return pow(maxCoordinate*2 - abs(x1) - abs(x2))
+}
+func pow(x float32) float32 {
+	return x * x
+}
+func abs(x float32) float32 {
+	return float32(math.Abs(float64(x)))
 }
 
 func xor(a, b bool) bool {
