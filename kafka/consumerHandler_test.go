@@ -22,7 +22,7 @@ func TestNewConsumerGroupHandler(t *testing.T) {
 	producer := mockKafka.NewMockProducer(ctrl)
 	matcher := mockMatcher.NewMockMatcher(ctrl)
 
-	consumerGroupHandler := newConsumerGroupHandler(matcher, producer)
+	consumerGroupHandler := newConsumerGroupHandler(matcher, producer, logger)
 	assert.NotNil(t, consumerGroupHandler.controller.matcher)
 	assert.NotNil(t, consumerGroupHandler.controller.producer)
 }
@@ -104,7 +104,7 @@ func testConsumerGroupHandlerInit(t *testing.T) (
 	producerCtrl := gomock.NewController(t)
 	producer := mockKafka.NewMockProducer(producerCtrl)
 
-	consumerGroupHandler := newConsumerGroupHandler(matcher, producer)
+	consumerGroupHandler := newConsumerGroupHandler(matcher, producer, logger)
 
 	return producerCtrl, producer, matcherCtrl, matcher, consumerGroupHandler
 }
