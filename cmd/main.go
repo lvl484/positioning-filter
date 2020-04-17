@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/lvl484/positioning-filter/logger"
+	"github.com/lvl484/positioning-filter/repository"
+	"github.com/lvl484/positioning-filter/web"
 
 	"github.com/lvl484/positioning-filter/config"
 	"github.com/lvl484/positioning-filter/storage"
@@ -25,6 +27,7 @@ func main() {
 
 	configPath := flag.String("cp", "../config", "Path to config file")
 	configName := flag.String("cn", "viper.config", "Name of config file")
+	serviceAddr := flag.String("p", ":8000", "Service addr")
 
 	flag.Parse()
 
@@ -64,8 +67,12 @@ func main() {
 		return
 	}
 
+	filters := repository.NewFiltersRepository(db)
+	srv := web.NewServer(filters, *serviceAddr, logger)
+	go srv.Run()
+
 	components = append(components,
-		//Put connection variables here
+		srv,
 		db)
 
 	sigs := make(chan os.Signal)
@@ -73,11 +80,11 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
-	logger.Info("Recieved", sig, "signal")
+	logger.Info("Received", sig, "signal")
 
 	if err := gracefulShutdown(shutdownTimeout, components); err != nil {
 		logger.Error(err)
 	}
 
-	logger.Info("Service successfuly shutdown")
+	logger.Info("Service successfully shutdown")
 }
