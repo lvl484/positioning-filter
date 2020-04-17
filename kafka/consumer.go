@@ -4,11 +4,11 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 
 	"github.com/Shopify/sarama"
 	"github.com/lvl484/positioning-filter/matcher"
+	"github.com/sirupsen/logrus"
 )
 
 type Consumer struct {
@@ -16,9 +16,10 @@ type Consumer struct {
 	Config        *Config
 	closeChan     chan bool
 	once          sync.Once
+	log           *logrus.Logger
 }
 
-func NewConsumer(config *Config) (*Consumer, error) {
+func NewConsumer(config *Config, log *logrus.Logger) (*Consumer, error) {
 	addr := getKafkaAddr(config)
 	version, err := sarama.ParseKafkaVersion(config.Version)
 
@@ -43,6 +44,7 @@ func NewConsumer(config *Config) (*Consumer, error) {
 		Config:        config,
 		closeChan:     closeChan,
 		once:          sync.Once{},
+		log:           log,
 	}, nil
 }
 
@@ -50,7 +52,7 @@ func (c *Consumer) Consume(matcher matcher.Matcher, producer Producer) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	handler := newConsumerGroupHandler(matcher, producer)
+	handler := newConsumerGroupHandler(matcher, producer, c.log)
 
 	for {
 		select {
@@ -59,10 +61,10 @@ func (c *Consumer) Consume(matcher matcher.Matcher, producer Producer) {
 				return
 			}
 		case err := <-c.ConsumerGroup.Errors():
-			log.Println(err)
+			c.log.Errorf("Can't consume message: %v", err)
 		default:
 			if err := c.ConsumerGroup.Consume(ctx, []string{c.Config.ConsumerTopic}, handler); err != nil {
-				log.Println(err)
+				c.log.Errorf("Can't consume message: %v", err)
 			}
 		}
 	}
