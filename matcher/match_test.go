@@ -24,13 +24,83 @@ func TestXor(t *testing.T) {
 }
 
 func TestMatchRoundCriticalPosition(t *testing.T) {
-	filter := newTestRoundFilter(-179, 0, 100, false)
-	position := newTestPosition(178, 0)
+	filter := newTestRoundFilter(0, 178, 10, false)
+	position := newTestPosition(0, -178)
 	matched, err := matchRound(position, filter)
 	assert.NoError(t, err)
 	assert.True(t, matched)
 }
 
+func TestMatchRoundCriticalPosition2(t *testing.T) {
+	filter := newTestRoundFilter(0, -178, 10, false)
+	position := newTestPosition(0, 178)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition3(t *testing.T) {
+	filter := newTestRoundFilter(0, 178, 10, false)
+	position := newTestPosition(0, 168)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition4(t *testing.T) {
+	filter := newTestRoundFilter(0, -178, 10, false)
+	position := newTestPosition(0, -168)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition5(t *testing.T) {
+	filter := newTestRoundFilter(0, 0, 10, false)
+	position := newTestPosition(0, 0)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition6(t *testing.T) {
+	filter := newTestRoundFilter(0, 0, 0, false)
+	position := newTestPosition(0, 0)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition7(t *testing.T) {
+	filter := newTestRoundFilter(0, 0, 0, true)
+	position := newTestPosition(0, 0)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.False(t, matched)
+}
+func TestMatchRoundCriticalPosition8(t *testing.T) {
+	filter := newTestRoundFilter(0, 180, 10, false)
+	position := newTestPosition(0, -180)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition9(t *testing.T) {
+	filter := newTestRoundFilter(0, 180, 10, false)
+	position := newTestPosition(0, -170)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition10(t *testing.T) {
+	filter := newTestRoundFilter(0, 175, 10, false)
+	position := newTestPosition(0, 180)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
+func TestMatchRoundCriticalPosition11(t *testing.T) {
+	filter := newTestRoundFilter(0, 175, 10, false)
+	position := newTestPosition(0, -180)
+	matched, err := matchRound(position, filter)
+	assert.NoError(t, err)
+	assert.True(t, matched)
+}
 func TestMatchRoundMatched(t *testing.T) {
 	filter := newTestRoundFilter(0, 0, 50, false)
 	position := newTestPosition(30, 40)
@@ -40,8 +110,8 @@ func TestMatchRoundMatched(t *testing.T) {
 }
 
 func TestMatchRoundNotMatched(t *testing.T) {
-	filter := newTestRoundFilter(1, 1, 50, false)
-	position := newTestPosition(-31.001, 41)
+	filter := newTestRoundFilter(0, 0, 50, false)
+	position := newTestPosition(-30.001, 40)
 	matched, err := matchRound(position, filter)
 	assert.NoError(t, err)
 	assert.False(t, matched)
