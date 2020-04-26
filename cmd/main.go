@@ -73,16 +73,12 @@ func main() {
 	go srv.Run()
 
 	botConfig := viper.NewNotificationBotConfig()
-	b, err := bot.NewNotificationBot(botConfig)
+	bot, err := bot.NewNotificationBot(botConfig, logger)
 	if err != nil {
-		log.Println(err)
+		logger.Error(err)
 		return
 	}
-	go b.Bot()
-	//for {
-	b.SendNotification("yep")
-	time.Sleep(time.Second)
-	//}
+	go bot.Bot()
 
 	components = append(components,
 		srv,

@@ -37,7 +37,7 @@ const (
 	consulServicePort            = "consul.ServicePort"
 	consulServiceHealthCheckPath = "consul.ServiceHealthCheckPath"
 
-	botTgbotapiKey = "bot.TgbotapiKey"
+	botTgbotapiKey = "tgBOT.TgbotapiKey"
 )
 
 type Config struct {

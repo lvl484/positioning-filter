@@ -1,21 +1,19 @@
+// Package bot provides telegram bot and functionality to send notifications
 package bot
 
 import (
-	"log"
 	"strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/sirupsen/logrus"
 )
-
-//const TgbotapiKey = "1192652390:AAEmF-btBEDG0uCkdOAEDwEXdTJM4mIqTWA"
-
-//var chatID int64
 
 type NotificationBot struct {
 	bot *tgbotapi.BotAPI
+	log *logrus.Logger
 }
 
-func NewNotificationBot(config *Config) (*NotificationBot, error) {
+func NewNotificationBot(config *Config, log *logrus.Logger) (*NotificationBot, error) {
 	bot, err := tgbotapi.NewBotAPI(config.TgbotapiKey)
 	if err != nil {
 		return nil, err
@@ -23,41 +21,43 @@ func NewNotificationBot(config *Config) (*NotificationBot, error) {
 
 	return &NotificationBot{
 			bot: bot,
+			log: log,
 		},
 		nil
 }
 
-// SendNotification sends chattable item to appropriate chat with information in message
-func (n *NotificationBot) SendNotification(message string) error {
-	_, err := n.bot.Send(tgbotapi.NewMessage(410287439, message))
+// SendNotification sends chattable item to appropriate chat with filtered position in message
+func (n *NotificationBot) SendNotification(chatID int64, message string) error {
+	_, err := n.bot.Send(tgbotapi.NewMessage(chatID, message))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+// Bot implements telegram bot configuration
 func (n *NotificationBot) Bot() error {
 
-	log.Printf("Authorized on account %s", n.bot.Self.UserName)
+	n.log.Infof("Authorized on account %s", n.bot.Self.UserName)
 
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates, err := n.bot.GetUpdatesChan(u)
 	if err != nil {
-		log.Println(err)
+		n.log.Errorf("Can't start channel for getting updates %v", err)
 	}
 
 	for update := range updates {
 		if err != nil {
-			log.Println(err)
+			n.log.Errorf("Can't handle updates %v", err)
 		}
 		reply := "I do not know how to answer"
 		if update.Message == nil {
 			continue
 		}
 
-		log.Printf("[%s] %v %s", update.Message.From.UserName, update.Message.From.ID, update.Message.Text)
+		n.log.Infof("[%s] %v %s", update.Message.From.UserName, update.Message.From.ID, update.Message.Text)
 
 		switch update.Message.Command() {
 		case "start":
@@ -67,23 +67,10 @@ func (n *NotificationBot) Bot() error {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, reply)
 		_, err := n.bot.Send(msg)
 		if err != nil {
+			n.log.Errorf("Can't send message %v", err)
 			return err
 		}
 
 	}
 	return nil
 }
-
-/*func main() {
-	b, err := NewNotificationBot()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	go b.Bot()
-	for {
-		b.SendNotification("yep")
-		time.Sleep(time.Second)
-	}
-}
-*/
