@@ -7,6 +7,7 @@ import (
 	"github.com/lvl484/positioning-filter/consul"
 	"github.com/lvl484/positioning-filter/kafka"
 	"github.com/lvl484/positioning-filter/logger"
+	"github.com/lvl484/positioning-filter/notifications/bot"
 	"github.com/lvl484/positioning-filter/storage"
 
 	"github.com/spf13/viper"
@@ -35,6 +36,8 @@ const (
 	consulServiceName            = "consul.ServiceName"
 	consulServicePort            = "consul.ServicePort"
 	consulServiceHealthCheckPath = "consul.ServiceHealthCheckPath"
+
+	botTgbotapiKey = "bot.TgbotapiKey"
 )
 
 type Config struct {
@@ -94,5 +97,11 @@ func (vcfg *Config) NewKafkaConfig() *kafka.Config {
 		ConsumerTopic:   vcfg.v.GetString(kafkaConsumerTopic),
 		ConsumerGroupID: vcfg.v.GetString(kafkaConsumerGroupID),
 		ProducerTopic:   vcfg.v.GetString(kafkaProducerTopic),
+	}
+}
+
+func (vcfg *Config) NewNotificationBotConfig() *bot.Config {
+	return &bot.Config{
+		TgbotapiKey: vcfg.v.GetString(botTgbotapiKey),
 	}
 }

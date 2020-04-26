@@ -14,6 +14,7 @@ import (
 	"github.com/lvl484/positioning-filter/web"
 
 	"github.com/lvl484/positioning-filter/config"
+	"github.com/lvl484/positioning-filter/notifications/bot"
 	"github.com/lvl484/positioning-filter/storage"
 )
 
@@ -70,6 +71,18 @@ func main() {
 	filters := repository.NewFiltersRepository(db)
 	srv := web.NewServer(filters, *serviceAddr, logger)
 	go srv.Run()
+
+	botConfig := viper.NewNotificationBotConfig()
+	b, err := bot.NewNotificationBot(botConfig)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	go b.Bot()
+	//for {
+	b.SendNotification("yep")
+	time.Sleep(time.Second)
+	//}
 
 	components = append(components,
 		srv,
