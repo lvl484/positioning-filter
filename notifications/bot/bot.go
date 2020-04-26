@@ -30,6 +30,7 @@ func NewNotificationBot(config *Config, log *logrus.Logger) (*NotificationBot, e
 func (n *NotificationBot) SendNotification(chatID int64, message string) error {
 	_, err := n.bot.Send(tgbotapi.NewMessage(chatID, message))
 	if err != nil {
+		n.log.Errorf("Can't send message %v", err)
 		return err
 	}
 	return nil
@@ -64,13 +65,11 @@ func (n *NotificationBot) Bot() error {
 			reply = "Your chatID: " + strconv.FormatInt(update.Message.Chat.ID, 10) + ". Please point it in the app and I will send you notifications."
 		}
 
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, reply)
-		_, err := n.bot.Send(msg)
+		err := n.SendNotification(update.Message.Chat.ID, reply)
 		if err != nil {
 			n.log.Errorf("Can't send message %v", err)
 			return err
 		}
-
 	}
 	return nil
 }
